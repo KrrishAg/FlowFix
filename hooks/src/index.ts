@@ -13,7 +13,7 @@ app.post("/hooks/catch/:userId/:zapId", async (req, res) => {
 
   await client.$transaction(async (tx) => {
     //storing in db
-    const run = await client.zapRun.create({
+    const run = await tx.zapRun.create({
       data: {
         zapId,
         metadata: body,   //this would be data sent in body in json format
@@ -21,7 +21,7 @@ app.post("/hooks/catch/:userId/:zapId", async (req, res) => {
     });
 
     //storing in the outbox as well
-    await client.zapRunOutbox.create({
+    await tx.zapRunOutbox.create({
       data: {
         zapRunId: run.id,
       },
