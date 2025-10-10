@@ -10,7 +10,8 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  // url      = env("DATABASE_URL")
+  url      = "postgresql://postgres:mypass@localhost:5432/postgres"
 }
 
 model User {
@@ -65,7 +66,8 @@ model ZapRun {
   id          String @id @default(uuid())
   zapId       String
   zap         Zap @relation(fields: [zapId], references: [id])
-  zaRunOutBox ZapRunOutbox?
+  zapRunOutBox ZapRunOutbox?
+  metadata    Json
 }
 
 model ZapRunOutbox {
