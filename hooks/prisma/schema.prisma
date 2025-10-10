@@ -14,36 +14,37 @@ datasource db {
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  name String
-  email String
-  password String
-  zaps Zap[]
+  id        Int @id @default(autoincrement())
+  name      String
+  emai      String
+  password  String
+  zaps      Zap[]
 }
 
 model Zap {
-  id String @id @default(uuid())
-  userId Int
-  user User @relation(fields: [userId], references: [id])
-  triggerId String  @unique
-  trigger Trigger?
-  actions Action[]
+  id          String @id @default(uuid())
+  userId      Int
+  user User   @relation(fields: [userId], references: [id])
+  triggerId   String  @unique
+  trigger     Trigger?
+  actions     Action[]
+  zapRuns     ZapRun[]
 }
 
 model Trigger {
-  id String  @id @default(uuid())
-  zapId String @unique
-  zap Zap @relation(fields: [zapId], references: [id])
-  triggerId String
-  type AvailableTrigger @relation(fields: [triggerId], references: [id])
+  id         String  @id @default(uuid())
+  zapId      String @unique
+  zap        Zap @relation(fields: [zapId], references: [id])
+  triggerId  String
+  type       AvailableTrigger @relation(fields: [triggerId], references: [id])
 }
 
 model Action {
-  id String @id @default(uuid())
-  zapId String
-  zap Zap @relation(fields: [zapId], references: [id])
-  actionId String
-  type AvailableAction @relation(fields: [actionId], references: [id])
+  id        String @id @default(uuid())
+  zapId     String
+  zap       Zap @relation(fields: [zapId], references: [id])
+  actionId  String
+  type      AvailableAction @relation(fields: [actionId], references: [id])
 }
 
 model AvailableTrigger {
@@ -58,4 +59,17 @@ model AvailableAction {
   name     String
   image    String
   actions  Action[]
+}
+
+model ZapRun {
+  id          String @id @default(uuid())
+  zapId       String
+  zap         Zap @relation(fields: [zapId], references: [id])
+  zaRunOutBox ZapRunOutbox?
+}
+
+model ZapRunOutbox {
+  id        String @id @default(uuid())
+  zapRunId  String  @unique
+  zapRun    ZapRun @relation(fields: [zapRunId], references: [id]) 
 }
