@@ -1,1 +1,1 @@
-export const TOPIC = "zap_events";
+export const TOPIC_NAME = "zap_events";

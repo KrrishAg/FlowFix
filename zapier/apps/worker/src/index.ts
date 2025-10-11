@@ -1,4 +1,4 @@
-import { TOPIC } from "@repo/common/config";
+import { TOPIC_NAME } from "@repo/common/config";
 import { Kafka } from "kafkajs";
 
 const kafka = new Kafka({
@@ -10,9 +10,10 @@ async function main() {
   const consumer = kafka.consumer({ groupId: "main-worker" });
   await consumer.connect();
 
-  await consumer.subscribe({ topic: TOPIC, fromBeginning: true });
+  await consumer.subscribe({ topic: TOPIC_NAME, fromBeginning: true });
 
   consumer.run({
+    autoCommit: false,
     eachMessage: async ({ topic, partition, message }) => {
       console.log({
         offset: message.offset,
@@ -23,6 +24,15 @@ async function main() {
       await new Promise((resolve) => setTimeout(resolve, 4000));
 
       console.log("PROCESS DONE");
+
+      //manually adding commit, instead of default autocommit  
+      await consumer.commitOffsets([
+        {
+          topic: TOPIC_NAME,
+          partition: partition,
+          offset: message.offset,
+        },
+      ]);
     },
   });
 }

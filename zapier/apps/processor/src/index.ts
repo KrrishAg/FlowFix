@@ -1,6 +1,6 @@
 import prisma from "@repo/db/client";
 import { Kafka } from "kafkajs";
-import { TOPIC } from "@repo/common/config";
+import { TOPIC_NAME } from "@repo/common/config";
 
 const kafka = new Kafka({
   clientId: "outbox-processor",
@@ -20,7 +20,7 @@ async function main() {
     //created the topic from the akfka cli
     pendingRows.forEach((row, idx) => {
       producer.send({
-        topic: TOPIC,
+        topic: TOPIC_NAME,
         messages: pendingRows.map((r) => ({
           value: r.zapRunId,
         })),
