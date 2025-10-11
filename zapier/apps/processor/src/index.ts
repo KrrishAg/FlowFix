@@ -3,7 +3,7 @@ import { Kafka } from "kafkajs";
 import { TOPIC } from "@repo/common/config";
 
 const kafka = new Kafka({
-  clientId: "new-client",
+  clientId: "outbox-processor",
   brokers: ["localhost:9092"],
 });
 
@@ -17,6 +17,7 @@ async function main() {
       take: 10,
     });
 
+    //created the topic from the akfka cli
     pendingRows.forEach((row, idx) => {
       producer.send({
         topic: TOPIC,

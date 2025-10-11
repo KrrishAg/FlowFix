@@ -28,17 +28,18 @@ model Zap {
 model Trigger {
   id               String           @id @default(uuid())
   zapId            String           @unique
-  triggerId        String
-  AvailableTrigger AvailableTrigger @relation(fields: [triggerId], references: [id])
+  triggerTypeId    String
+  AvailableTrigger AvailableTrigger @relation(fields: [triggerTypeId], references: [id])
   zap              Zap              @relation(fields: [zapId], references: [id])
 }
 
 model Action {
   id              String          @id @default(uuid())
   zapId           String
-  actionId        String
-  AvailableAction AvailableAction @relation(fields: [actionId], references: [id])
+  actionTypeId    String
+  AvailableAction AvailableAction @relation(fields: [actionTypeId], references: [id])
   zap             Zap             @relation(fields: [zapId], references: [id])
+  sortOrder       Int             @default(0)     //need to change it later
 }
 
 model AvailableTrigger {
