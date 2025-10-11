@@ -25,12 +25,12 @@ async function main() {
 
       console.log("PROCESS DONE");
 
-      //manually adding commit, instead of default autocommit  
+      //manually adding commit, instead of default autocommit
       await consumer.commitOffsets([
         {
           topic: TOPIC_NAME,
           partition: partition,
-          offset: message.offset,
+          offset: (parseInt(message.offset) + 1).toString(), //we mention the offset, which should be processed next, so give next offset so that same msg dont repeat twice.
         },
       ]);
     },
