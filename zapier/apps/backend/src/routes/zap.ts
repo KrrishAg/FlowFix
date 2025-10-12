@@ -1,18 +1,129 @@
 import express from "express";
 import { authMiddleware } from "../middleware.js";
+import { zapCreateSchema } from "../types/index.js";
+import prisma from "@repo/db/client";
 
 const zapRouter = express.Router();
 
-zapRouter.post("/", authMiddleware, (req, res) => {
-  console.log("Trying to create a zap");
+//creating a zap
+zapRouter.post("/createZap", authMiddleware, async (req, res) => {
+  try {
+    //@ts-ignore
+    const userId: string = req.id;
+    const body = req.body;
+    const parsedData = zapCreateSchema.safeParse(body);
+
+    if (!parsedData.success) {
+      console.log(parsedData.error);
+      return res
+        .status(411)
+        .json({ error: "Wrong data format sent for creating a zap" });
+    }
+
+    const zapId = await prisma.$transaction(async (tx) => {
+      //creating a zap, but will need trigger id as well
+      const zap = await tx.zap.create({
+        data: {
+          userId: parseInt(userId),
+          triggerId: "",
+          actions: {
+            create: parsedData.data.actions.map((xx, idx) => ({
+              sortOrder: idx,
+              actionTypeId: xx.availableActionId,
+            })),
+          },
+        },
+      });
+
+      //creating a trigger using the created zap
+      const trigger = await tx.trigger.create({
+        data: {
+          zapId: zap.id,
+          triggerTypeId: parsedData.data.availableTriggerId,
+        },
+      });
+
+      //updating the zap with the new trigger id
+      await tx.zap.update({
+        where: {
+          id: zap.id,
+        },
+        data: {
+          triggerId: trigger.id,
+        },
+      });
+
+      return zap.id;
+    });
+
+    res.json({ zapId });
+  } catch (error) {
+    console.log("ERROR", error);
+    return res.status(404).json({ error });
+  }
 });
 
-zapRouter.get("/", authMiddleware, (req, res) => {
-  console.log("Get all zaps");
+//getting all the zaps for the logged in user
+zapRouter.get("/", authMiddleware, async (req, res) => {
+  try {
+    //need to include everything, as showing on FE
+    //@ts-ignore
+    const userId: string = req.id;
+    const zaps = await prisma.zap.findMany({
+      where: {
+        userId: parseInt(userId),
+      },
+      include: {
+        actions: {
+          include: {
+            AvailableAction: true,
+          },
+        },
+        trigger: {
+          include: {
+            AvailableTrigger: true,
+          },
+        },
+      },
+    });
+
+    return res.json({ zaps });
+  } catch (error) {
+    console.log("ERROR", error);
+    return res.status(404).json({ error });
+  }
 });
 
-zapRouter.get("/:zapid", authMiddleware, (req, res) => {
-  console.log("Trying to details of a particular zap");
+zapRouter.get("/:zapid", authMiddleware, async (req, res) => {
+  try {
+    const zapid = req.params.zapid;
+    //need to include everything, as showing on FE
+    //@ts-ignore
+    const userId: string = req.id;
+    const zap = await prisma.zap.findFirst({
+      where: {
+        userId: parseInt(userId),
+        id: zapid,
+      },
+      include: {
+        actions: {
+          include: {
+            AvailableAction: true,
+          },
+        },
+        trigger: {
+          include: {
+            AvailableTrigger: true,
+          },
+        },
+      },
+    });
+
+    return res.json({ zap });
+  } catch (error) {
+    console.log("ERROR", error);
+    return res.status(404).json({ error });
+  }
 });
 
 export default zapRouter;
