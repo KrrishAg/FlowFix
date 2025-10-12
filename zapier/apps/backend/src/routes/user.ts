@@ -1,15 +1,16 @@
 import express from "express";
 import { authMiddleware } from "../middleware.js";
-import { signinData, signupData } from "../types/index.js";
+import { signinSchema, signupSchema } from "../types/index.js";
 import prisma from "@repo/db/client";
 import jwt from "jsonwebtoken";
+import { jwtsecret } from "../config.js";
 
 const userRouter = express.Router();
 
 userRouter.post("/signup", async (req, res) => {
   try {
     const body = req.body;
-    const parsedData = signupData.safeParse(body);
+    const parsedData = signupSchema.safeParse(body);
 
     if (!parsedData.success) {
       console.log(parsedData.error);
@@ -31,6 +32,8 @@ userRouter.post("/signup", async (req, res) => {
       },
     });
 
+    //await send email
+
     res.json({
       message: "User created",
     });
@@ -43,7 +46,7 @@ userRouter.post("/signup", async (req, res) => {
 userRouter.post("/signin", async (req, res) => {
   try {
     const body = req.body;
-    const parsedData = signinData.safeParse(body);
+    const parsedData = signinSchema.safeParse(body);
 
     if (!parsedData.success) {
       console.log(parsedData.error);
@@ -60,7 +63,6 @@ userRouter.post("/signin", async (req, res) => {
       return res.status(411).json({ error: "User doesn't exist" });
     }
 
-    const jwtsecret = process.env.JWT_SECRET;
     if (!jwtsecret) {
       return res
         .status(411)
@@ -77,7 +79,7 @@ userRouter.post("/signin", async (req, res) => {
   }
 });
 
-userRouter.post("/", authMiddleware, async (req, res) => {
+userRouter.get("/", authMiddleware, async (req, res) => {
   try {
     const user = await prisma.user.findFirst({
       where: {
