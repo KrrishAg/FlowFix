@@ -10,19 +10,15 @@ export const Appbar = () => {
       <div className="flex flex-col justify-center text-2xl font-extrabold">
         Zapier
       </div>
-      <div className="flex">
-        <div className="pr-4">
-          <LinkButton onClick={() => {}}>Contact Sales</LinkButton>
-        </div>
-        <div className="pr-4">
-          <LinkButton
-            onClick={() => {
-              router.push("/login");
-            }}
-          >
-            Login
-          </LinkButton>
-        </div>
+      <div className="flex gap-4">
+        <LinkButton onClick={() => {}}>Contact Sales</LinkButton>
+        <LinkButton
+          onClick={() => {
+            router.push("/login");
+          }}
+        >
+          Login
+        </LinkButton>
         <PrimaryButton
           onClick={() => {
             router.push("/signup");

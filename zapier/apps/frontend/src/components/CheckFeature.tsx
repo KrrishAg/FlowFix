@@ -1,9 +1,7 @@
 export const CheckFeature = ({ label }: { label: string }) => {
   return (
-    <div className="flex">
-      <div className="pr-4">
-        <CheckMark />
-      </div>
+    <div className="flex gap-4 items-center">
+      <CheckMark />
       {label}
     </div>
   );
