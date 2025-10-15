@@ -7,7 +7,7 @@ export default function Modal({
 }: {
   index: number;
   onSelect: (
-    params: null | { name: string; id: string; metadata: any }
+    params: null | { name: string; id: string; metadata: any; image: string }
   ) => void;
   availableItems: { id: string; name: string; image: string }[];
 }) {
@@ -62,7 +62,7 @@ export default function Modal({
                   key={id}
                   className="flex items-center gap-5 p-2 border cursor-pointer h-15 hover:bg-slate-200"
                   onClick={() => {
-                    onSelect({ id, name });
+                    onSelect({ id, name, image });
                   }}
                 >
                   <Image

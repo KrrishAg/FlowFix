@@ -11,21 +11,24 @@ export const ZapCell = ({
   onClick: () => void;
   image: string;
 }) => {
+  console.log(image);
   return (
     <div
       onClick={onClick}
-      className="border border-black py-8 px-8 flex w-[300px] justify-center cursor-pointer"
+      className="border border-black py-8 px-8 flex w-[300px]  cursor-pointer"
     >
-      <div className="flex text-xl">
+      <div className="flex text-xl gap-2">
         <div className="font-bold">{index}.</div>
-        <div className="font-bold">
-          <Image
-            src={image}
-            alt=""
-            width={10}
-            height={10}
-            className="w-10 rounded-2xl"
-          />
+        <div>
+          {image.length > 0 && (
+            <Image
+              src={image}
+              alt=""
+              width={10}
+              height={10}
+              className="w-10 rounded-2xl"
+            />
+          )}
         </div>
         <div> {name}</div>
       </div>

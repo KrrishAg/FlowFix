@@ -40,6 +40,7 @@ export default function Page() {
   const [selectedTrigger, setSelectedTrigger] = useState<{
     id: string;
     name: string;
+    image: string;
   }>();
 
   //which actions are chosen by the user
@@ -48,6 +49,7 @@ export default function Page() {
       idx: number;
       availableActionId: string;
       availableActionName: string;
+      availableActionImage: string;
       metadata: unknown;
     }[]
   >([]);
@@ -62,13 +64,14 @@ export default function Page() {
         idx: a.length + 2,
         availableActionId: "",
         availableActionName: "",
+        availableActionImage: "",
         metadata: {},
       },
     ]);
   }
 
   function changeModelLayout(
-    params: null | { name: string; id: string; metadata: any }
+    params: null | { name: string; id: string; metadata: any; image: string }
   ) {
     if (params === null) {
       //clciked on cross
@@ -77,6 +80,7 @@ export default function Page() {
       setSelectedTrigger({
         id: params.id,
         name: params.name,
+        image: params.image,
       });
     } else if (modelIndex != undefined) {
       //chose an action, so chnaging its data in the array, its at idx-1
@@ -86,6 +90,7 @@ export default function Page() {
           idx: modelIndex,
           availableActionId: params.id,
           availableActionName: params.name,
+          availableActionImage: params.image,
           metadata: params.metadata,
         };
         return newActs;
@@ -105,6 +110,7 @@ export default function Page() {
             }}
             name={selectedTrigger?.name ? selectedTrigger.name : "Trigger"}
             index={1}
+            image={selectedTrigger?.image ? selectedTrigger.image : ""}
           />
         </div>
         <div className="w-full pt-2 pb-2">
@@ -120,6 +126,11 @@ export default function Page() {
                     : "Action"
                 }
                 index={action.idx}
+                image={
+                  action?.availableActionImage
+                    ? action.availableActionImage
+                    : ""
+                }
               />
             </div>
           ))}
