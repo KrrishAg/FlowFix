@@ -11,7 +11,6 @@ export const ZapCell = ({
   onClick: () => void;
   image: string;
 }) => {
-  console.log(image);
   return (
     <div
       onClick={onClick}

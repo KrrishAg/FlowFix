@@ -5,6 +5,7 @@ import Modal from "@/components/Modal";
 import { ZapCell } from "@/components/ZapCell";
 import { PrimaryButton } from "@/components/buttons/PrimaryButton";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 function useAvailableActionsAndTriggers() {
@@ -32,6 +33,7 @@ function useAvailableActionsAndTriggers() {
 }
 
 export default function Page() {
+  const router = useRouter();
   //get avl actions and triggers from backend
   const { availableActions, availableTriggers } =
     useAvailableActionsAndTriggers();
@@ -102,6 +104,46 @@ export default function Page() {
   return (
     <div>
       {/* <Appbar /> */}
+      <div className="flex justify-end">
+        <PrimaryButton
+          onClick={async () => {
+            //returning if no trigger selected
+            if (!selectedTrigger?.id) {
+              alert("Kindly select a trigger");
+              return;
+            }
+            const find = selectedActions.find(
+              (action) => !action.availableActionId
+            );
+
+            //returning if no action selected or some action not chosen
+            if (find || selectedActions.length === 0) {
+              alert("Kindly choose the actions");
+              return;
+            }
+
+            await axios.post(
+              `${BACKEND_URL}/api/v1/zap/createZap`,
+              {
+                availableTriggerId: selectedTrigger?.id,
+                triggerMetaData: {},
+                actions: selectedActions.map((action) => ({
+                  availableActionId: action.availableActionId,
+                  actionMetaData: action.metadata,
+                })),
+              },
+              {
+                headers: {
+                  Authorization: localStorage.getItem("token"),
+                },
+              }
+            );
+            router.push("/dashboard");
+          }}
+        >
+          Publish
+        </PrimaryButton>
+      </div>
       <div className="w-full min-h-screen bg-slate-200 flex flex-col justify-center">
         <div className="flex justify-center w-full">
           <ZapCell

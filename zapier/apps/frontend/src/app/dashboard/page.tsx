@@ -18,7 +18,7 @@ interface Zap {
     zapId: string;
     actionId: string;
     sortingOrder: number;
-    type: {
+    AvailableAction: {
       id: string;
       name: string;
       image: string;
@@ -28,7 +28,7 @@ interface Zap {
     id: string;
     zapId: string;
     triggerId: string;
-    type: {
+    AvailableTrigger: {
       id: string;
       name: string;
       image: string;
@@ -119,21 +119,23 @@ function ZapTable({ zaps }: { zaps: Zap[] }) {
         <div key={z.id} className="flex border-b border-t py-4">
           <div className="flex-1 flex">
             <Image
-              src={z.trigger.type.image}
-              alt={z.trigger.type.name}
-              className="w-[30px] h-[30px]"
+              src={z.trigger.AvailableTrigger?.image}
+              alt={z.trigger.AvailableTrigger?.name}
+              width={60}
+              height={60}
             />{" "}
             {z.actions.map((x) => (
               <Image
                 key={x.id}
-                src={x.type.image}
-                alt={x.type.name}
-                className="w-[30px] h-[30px]"
+                src={x.AvailableAction?.image}
+                alt={x.AvailableAction?.name}
+                width={60}
+                height={60}
               />
             ))}
           </div>
           <div className="flex-1">{z.id}</div>
-          <div className="flex-1">Nov 13, 2023</div>
+          <div className="flex-1">16 Oct, 2025</div>
           <div className="flex-1">{`${HOOKS_URL}/hooks/catch/1/${z.id}`}</div>
           <div className="flex-1">
             <LinkButton
