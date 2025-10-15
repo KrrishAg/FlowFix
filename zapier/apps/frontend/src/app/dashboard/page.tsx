@@ -7,6 +7,7 @@ import { BACKEND_URL, HOOKS_URL } from "../config";
 import { LinkButton } from "@/components/buttons/LinkButton";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { jwtDecode } from "jwt-decode";
 
 //the type of data returned by the backend, got from postman
 interface Zap {
@@ -123,7 +124,8 @@ function ZapTable({ zaps }: { zaps: Zap[] }) {
               alt={z.trigger.AvailableTrigger?.name}
               width={60}
               height={60}
-            />{" "}
+              className="w-[33px] h-[33px]"
+            />
             {z.actions.map((x) => (
               <Image
                 key={x.id}
@@ -131,12 +133,13 @@ function ZapTable({ zaps }: { zaps: Zap[] }) {
                 alt={x.AvailableAction?.name}
                 width={60}
                 height={60}
+                className="w-[33px] h-[33px]"
               />
             ))}
           </div>
           <div className="flex-1">{z.id}</div>
           <div className="flex-1">16 Oct, 2025</div>
-          <div className="flex-1">{`${HOOKS_URL}/hooks/catch/1/${z.id}`}</div>
+          <div className="flex-1">{`${HOOKS_URL}/hooks/catch/${jwtDecode(localStorage.getItem("token") as string).id}/${z.id}`}</div>
           <div className="flex-1">
             <LinkButton
               onClick={() => {
