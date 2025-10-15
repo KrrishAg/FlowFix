@@ -101,6 +101,24 @@ export default function Page() {
     setModelIndex(null);
   }
 
+  function removeAction(actIndex: number) {
+    //since dif of 2 in index of action array, to show in serial
+    const idx = actIndex - 2;
+
+    setSelectedActions((a) => {
+      const tmpActions = a.filter((xx) => xx.idx !== actIndex);
+      console.log(a);
+      const newActions = tmpActions.map((action, i) => {
+        if (i < idx) return { ...action };
+        else {
+          return { ...action, idx: action.idx - 1 };
+        }
+      });
+      console.log(newActions);
+      return newActions;
+    });
+  }
+
   return (
     <div>
       {/* <Appbar /> */}
@@ -173,6 +191,7 @@ export default function Page() {
                     ? action.availableActionImage
                     : ""
                 }
+                removeAction={removeAction}
               />
             </div>
           ))}
