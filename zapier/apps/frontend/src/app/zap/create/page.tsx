@@ -1,5 +1,6 @@
 "use client";
 
+import Modal from "@/components/Modal";
 import { ZapCell } from "@/components/ZapCell";
 import { PrimaryButton } from "@/components/buttons/PrimaryButton";
 import { useState } from "react";
@@ -12,12 +13,54 @@ export default function Page() {
 
   const [selectedActions, setSelectedActions] = useState<
     {
-      index: number;
+      idx: number;
       availableActionId: string;
       availableActionName: string;
       metadata: unknown;
     }[]
   >([]);
+
+  const [modelIndex, setModelIndex] = useState<null | number>(null);
+
+  function addAction() {
+    setSelectedActions((a) => [
+      ...a,
+      {
+        idx: a.length + 2,
+        availableActionId: "",
+        availableActionName: "",
+        metadata: {},
+      },
+    ]);
+  }
+
+  function changeModelLayout(
+    params: null | { name: string; id: string; metadata: any }
+  ) {
+    if (params === null) {
+      //clciked somewhere else
+      setModelIndex(null);
+      return;
+    } else if (modelIndex === 1) {
+      //chose a trigger
+      setSelectedTrigger({
+        id: params.id,
+        name: params.name,
+      });
+    } else if (modelIndex != undefined) {
+      //chose an action, so chnaging its data in the array, its at idx-1
+      setSelectedActions((a) => {
+        const newActs = [...a];
+        newActs[modelIndex - 2] = {
+          idx: modelIndex,
+          availableActionId: params.id,
+          availableActionName: params.name,
+          metadata: params.metadata,
+        };
+        return newActs;
+      });
+    }
+  }
 
   return (
     <div>
@@ -25,7 +68,9 @@ export default function Page() {
       <div className="w-full min-h-screen bg-slate-200 flex flex-col justify-center">
         <div className="flex justify-center w-full">
           <ZapCell
-            onClick={() => {}}
+            onClick={() => {
+              setModelIndex(1);
+            }}
             name={selectedTrigger?.name ? selectedTrigger.name : "Trigger"}
             index={1}
           />
@@ -34,37 +79,28 @@ export default function Page() {
           {selectedActions.map((action, index) => (
             <div key={index} className="pt-2 flex justify-center">
               <ZapCell
-                onClick={() => {}}
+                onClick={() => {
+                  setModelIndex(action.idx);
+                }}
                 name={
                   action.availableActionName
                     ? action.availableActionName
                     : "Action"
                 }
-                index={action.index}
+                index={action.idx}
               />
             </div>
           ))}
         </div>
         <div className="flex justify-center">
           <div>
-            <PrimaryButton
-              onClick={() => {
-                setSelectedActions((a) => [
-                  ...a,
-                  {
-                    index: a.length + 2,
-                    availableActionId: "",
-                    availableActionName: "",
-                    metadata: {},
-                  },
-                ]);
-              }}
-            >
+            <PrimaryButton onClick={addAction}>
               <div className="text-2xl">+</div>
             </PrimaryButton>
           </div>
         </div>
       </div>
+      {modelIndex && <Modal index={modelIndex} onSelect={changeModelLayout} />}
     </div>
   );
 }
