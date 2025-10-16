@@ -1,0 +1,32 @@
+import { PrismaClient } from "@prisma/client";
+const prismaClient = new PrismaClient();
+
+async function main() {
+  await prismaClient.availableTrigger.create({
+    data: {
+      id: "webhook",
+      name: "Webhook",
+      image:
+        "https://www.svix.com/resources/assets/images/color-webhook-240-1deccb0e365ff4ea493396ad28638fb7.png",
+    },
+  });
+
+  await prismaClient.availableAction.create({
+    data: {
+      id: "send-sol",
+      name: "Send Solana",
+      image: "https://s2.coinmarketcap.com/static/img/coins/200x200/5426.png",
+    },
+  });
+
+  await prismaClient.availableAction.create({
+    data: {
+      id: "email",
+      name: "Send Email",
+      image:
+        "https://img.freepik.com/premium-vector/orange-envelope-with-t-mail-logo-it_1277826-407.jpg?semt=ais_hybrid&w=740&q=80",
+    },
+  });
+}
+
+main();

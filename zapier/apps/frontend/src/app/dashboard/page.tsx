@@ -53,7 +53,8 @@ function useZaps() {
         setZaps(res.data.zaps);
       })
       .catch((err) => {
-        setError(err.response.data.error);
+        // console.log("ERROR", err);
+        setError(JSON.stringify(err.response.data.error));
       })
       .finally(() => setLoading(false));
   }, []);
@@ -139,7 +140,7 @@ function ZapTable({ zaps }: { zaps: Zap[] }) {
           </div>
           <div className="flex-1">{z.id}</div>
           <div className="flex-1">16 Oct, 2025</div>
-          <div className="flex-1">{`${HOOKS_URL}/hooks/catch/${jwtDecode(localStorage.getItem("token") as string).id}/${z.id}`}</div>
+          {/* <div className="flex-1">{`${HOOKS_URL}/hooks/catch/${jwtDecode(localStorage.getItem("token") as string).id}/${z.id}`}</div> */}
           <div className="flex-1">
             <LinkButton
               onClick={() => {

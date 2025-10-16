@@ -1,4 +1,9 @@
+"use client";
+
 import Image from "next/image";
+import { useState } from "react";
+import { Email } from "./selectors/Email";
+import { Solana } from "./selectors/Solana";
 
 export default function Modal({
   index,
@@ -11,11 +16,18 @@ export default function Modal({
   ) => void;
   availableItems: { id: string; name: string; image: string }[];
 }) {
+  const [step, setStep] = useState(0);
+  const [selectedAction, setSelectedAction] = useState<{
+    id: string;
+    name: string;
+  }>();
+
+  const isTrigger = index === 1;
+
   return (
     <div
       id="static-modal"
       data-modal-backdrop="static"
-      aria-hidden="true"
       className="flex backdrop-blur-xs overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full"
     >
       <div className="relative p-4 w-full max-w-2xl max-h-full">
@@ -56,26 +68,51 @@ export default function Modal({
           </div>
           {/* <!-- Modal body --> */}
           <div className="p-5 flex flex-col gap-5">
-            {availableItems.map(({ id, name, image }) => {
-              return (
-                <div
-                  key={id}
-                  className="flex items-center gap-5 p-2 border cursor-pointer h-15 hover:bg-slate-200"
-                  onClick={() => {
-                    onSelect({ id, name, image });
-                  }}
-                >
-                  <Image
-                    src={image}
-                    alt=""
-                    width={10}
-                    height={10}
-                    className="w-10 rounded-2xl"
-                  />
-                  <p className="text-lg">{name}</p>
-                </div>
-              );
-            })}
+            {/* //render the first modal of chooisngg the trigger/action */}
+            {step === 0 && (
+              <div>
+                {availableItems.map(({ id, name, image }) => {
+                  return (
+                    <div
+                      key={id}
+                      className="flex items-center gap-5 p-2 border cursor-pointer h-15 hover:bg-slate-200"
+                      onClick={() => {
+                        if (isTrigger) {
+                          onSelect({ id, name, image });
+                        } else {
+                          setStep((s) => s + 1);
+                          setSelectedAction({ id, name });
+                          onSelect({ id, name, image });
+                        }
+                      }}
+                    >
+                      <Image
+                        src={image}
+                        alt=""
+                        width={10}
+                        height={10}
+                        className="w-10 rounded-2xl"
+                      />
+                      <p className="text-lg">{name}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* if next step, checked by step variable, and matches email */}
+            {step === 1 && selectedAction?.id === "email" && (
+              <div>
+                <Email />
+              </div>
+            )}
+
+            {/* if next step, checked by step variable, and matches solana */}
+            {step === 1 && selectedAction?.id === "send-sol" && (
+              <div>
+                <Solana />
+              </div>
+            )}
           </div>
         </div>
       </div>
