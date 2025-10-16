@@ -5,7 +5,7 @@ import { SecondaryButton } from "../buttons/SecondaryButton";
 export const Solana = ({
   setMetadata,
 }: {
-  setMetadata: (params: any) => void;
+  setMetadata: (metadata: any) => void;
 }) => {
   const [address, setAddress] = useState("");
   const [amount, setAmount] = useState("");
@@ -17,7 +17,7 @@ export const Solana = ({
         onChange={(e) => setAddress(e.target.value)}
       />
       <Input
-        label="Body: "
+        label="Amount: "
         placeholder="Text"
         onChange={(e) => setAmount(e.target.value)}
       />

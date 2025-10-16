@@ -5,16 +5,16 @@ import { SecondaryButton } from "../buttons/SecondaryButton";
 export const Email = ({
   setMetadata,
 }: {
-  setMetadata: (params: any) => void;
+  setMetadata: (metadata: any) => void;
 }) => {
-  const [recEmail, setRecEmail] = useState("");
+  const [email, setEmail] = useState("");
   const [body, setBody] = useState("");
   return (
     <div>
       <Input
         label="To: "
         placeholder="Receiver's email"
-        onChange={(e) => setRecEmail(e.target.value)}
+        onChange={(e) => setEmail(e.target.value)}
       />
       <Input
         label="Body: "
@@ -23,7 +23,7 @@ export const Email = ({
       />
       <SecondaryButton
         onClick={() => {
-          setMetadata({ recEmail, body });
+          setMetadata({ email, body });
         }}
       >
         Submit
