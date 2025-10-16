@@ -16,10 +16,14 @@ export default function Modal({
   ) => void;
   availableItems: { id: string; name: string; image: string }[];
 }) {
+  //stores whether on available actions modal OR on the next step to fill up the input fields
   const [step, setStep] = useState(0);
+
+  //when action clicked, it stores these three fields which will later be used to call the onSelect function
   const [selectedAction, setSelectedAction] = useState<{
     id: string;
     name: string;
+    image: string;
   }>();
 
   const isTrigger = index === 1;
@@ -78,11 +82,11 @@ export default function Modal({
                       className="flex items-center gap-5 p-2 border cursor-pointer h-15 hover:bg-slate-200"
                       onClick={() => {
                         if (isTrigger) {
-                          onSelect({ id, name, image });
+                          onSelect({ id, name, image, metadata: {} });
                         } else {
                           setStep((s) => s + 1);
-                          setSelectedAction({ id, name });
-                          onSelect({ id, name, image });
+                          setSelectedAction({ id, name, image });
+                          // onSelect({ id, name, image });
                         }
                       }}
                     >
@@ -103,14 +107,22 @@ export default function Modal({
             {/* if next step, checked by step variable, and matches email */}
             {step === 1 && selectedAction?.id === "email" && (
               <div>
-                <Email />
+                <Email
+                  setMetadata={(metadata) => {
+                    onSelect({ ...selectedAction, metadata });
+                  }}
+                />
               </div>
             )}
 
             {/* if next step, checked by step variable, and matches solana */}
             {step === 1 && selectedAction?.id === "send-sol" && (
               <div>
-                <Solana />
+                <Solana
+                  setMetadata={(metadata) => {
+                    onSelect({ ...selectedAction, metadata });
+                  }}
+                />
               </div>
             )}
           </div>
