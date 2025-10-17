@@ -1,8 +1,8 @@
-import { PrismaClient } from "@prisma/client";
-const prismaClient = new PrismaClient();
+//@ts-ignore
+import prisma from "./index.ts";
 
 async function main() {
-  await prismaClient.availableTrigger.create({
+  await prisma.availableTrigger.create({
     data: {
       id: "webhook",
       name: "Webhook",
@@ -11,7 +11,7 @@ async function main() {
     },
   });
 
-  await prismaClient.availableAction.create({
+  await prisma.availableAction.create({
     data: {
       id: "send-sol",
       name: "Send Solana",
@@ -19,7 +19,7 @@ async function main() {
     },
   });
 
-  await prismaClient.availableAction.create({
+  await prisma.availableAction.create({
     data: {
       id: "email",
       name: "Send Email",
