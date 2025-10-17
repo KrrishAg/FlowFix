@@ -18,13 +18,11 @@ async function main() {
     });
 
     //created the topic from the akfka cli
-    pendingRows.forEach((row, idx) => {
-      producer.send({
-        topic: TOPIC_NAME,
-        messages: pendingRows.map((r) => ({
-          value: r.zapRunId,
-        })),
-      });
+    await producer.send({
+      topic: TOPIC_NAME,
+      messages: pendingRows.map((r) => ({
+        value: JSON.stringify({ zapRunId: r.zapRunId, stage: 0 }),
+      })),
     });
 
     //after putting them in kafka, deleting from the zaprunoutbox table
