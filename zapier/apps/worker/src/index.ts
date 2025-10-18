@@ -1,6 +1,18 @@
 import { TOPIC_NAME } from "@repo/common/config";
 import prisma from "@repo/db/client";
 import { Kafka } from "kafkajs";
+import { parse } from "./parse.js";
+
+//sent data this from postman, so this was stores aas zapRun's metadata
+// {
+//     "comment": {
+//         "email": "Krrish@temp.com",
+//         "amount": 50,
+//         "address": "1239213479hfdecifw9e79"
+//     }
+// }
+//solana data what I filled in those fields on FE: { "amount" : " {comment. amount}" , " address" : " {comment. address}
+//email data what I filled in those fields on FE: {"body" : "You have received a bounty of {comment. amount}, Thanks to krrish", "email " : "{comment . email}"}
 
 const kafka = new Kafka({
   clientId: "worker-process",
@@ -26,13 +38,9 @@ async function main() {
         value: message.value?.toString(),
       });
 
-      console.log("CAMME1");
       if (!message.value?.toString()) return;
 
-      console.log("CAMME2", message.value.toString());
-
       const parsedData = JSON.parse(message.value?.toString());
-      console.log("CAMME3");
       const zapRunId = parsedData.zapRunId;
       const stage = parsedData.stage; //this stage tells which action is/should currently be run
 
@@ -58,11 +66,23 @@ async function main() {
         return;
       }
 
+      const actionMetadata = currAction.metadata as
+        | Record<string, any>
+        | undefined;
+
       if (currAction.actionTypeId === "email") {
         console.log(`Stage ${stage} running: Sending out an email`);
+
+        const email = parse(actionMetadata?.email, zapRunDetails?.metadata);
+        const body = parse(actionMetadata?.body, zapRunDetails?.metadata);
+        console.log(`Sending out an email ${email} with the body ${body}`);
       }
       if (currAction.actionTypeId === "send-sol") {
         console.log(`Stage ${stage} running: Sending out solana`);
+
+        const address = parse(actionMetadata?.address, zapRunDetails?.metadata);
+        const amount = parse(actionMetadata?.amount, zapRunDetails?.metadata);
+        console.log(`Sending out SOLana of quantity ${amount} to ${address}`);
       }
 
       await new Promise((resolve) => setTimeout(resolve, 500));
