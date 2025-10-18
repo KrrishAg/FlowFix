@@ -26,6 +26,7 @@ zapRouter.post("/createZap", authMiddleware, async (req, res) => {
         data: {
           userId: parseInt(userId),
           triggerId: "",
+          date: new Date(),
           actions: {
             create: parsedData.data.actions.map((xx, idx) => ({
               sortOrder: idx,
@@ -121,6 +122,26 @@ zapRouter.get("/:zapid", authMiddleware, async (req, res) => {
     });
 
     return res.json({ zap });
+  } catch (error) {
+    console.log("ERROR", error);
+    return res.status(404).json({ error });
+  }
+});
+
+zapRouter.delete("/:zapid", authMiddleware, async (req, res) => {
+  try {
+    const zapid = req.params.zapid;
+    //need to include everything, as showing on FE
+    //@ts-ignore
+    const userId: string = req.id;
+    await prisma.zap.delete({
+      where: {
+        id: zapid,
+        userId: +userId,
+      },
+    });
+
+    return res.json({ success: true, message: "Deleted zap successfully" });
   } catch (error) {
     console.log("ERROR", error);
     return res.status(404).json({ error });

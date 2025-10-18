@@ -18,10 +18,11 @@ model User {
 model Zap {
   id        String   @id @default(uuid())
   userId    Int
+  date      DateTime  
   triggerId String   @unique
   actions   Action[]
   trigger   Trigger?
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   zapRuns   ZapRun[]
 }
 
@@ -30,7 +31,7 @@ model Trigger {
   zapId            String           @unique
   triggerTypeId    String
   AvailableTrigger AvailableTrigger @relation(fields: [triggerTypeId], references: [id])
-  zap              Zap              @relation(fields: [zapId], references: [id])
+  zap              Zap              @relation(fields: [zapId], references: [id], onDelete: Cascade)
 }
 
 model Action {
@@ -38,7 +39,7 @@ model Action {
   zapId           String
   actionTypeId    String
   AvailableAction AvailableAction @relation(fields: [actionTypeId], references: [id])
-  zap             Zap             @relation(fields: [zapId], references: [id])
+  zap             Zap             @relation(fields: [zapId], references: [id], onDelete: Cascade)
   sortOrder       Int             @default(0)     //need to change it later
   metadata        Json            @default("{}")
 }
@@ -61,7 +62,7 @@ model ZapRun {
   id           String        @id @default(uuid())
   zapId        String
   metadata     Json
-  zap          Zap           @relation(fields: [zapId], references: [id])
+  zap          Zap           @relation(fields: [zapId], references: [id], onDelete: Cascade)
   zapRunOutBox ZapRunOutbox?
 }
 

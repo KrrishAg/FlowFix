@@ -1,5 +1,7 @@
 ("use server");
 
+//using the api key of my unofficial email id
+
 import { Resend } from "resend";
 import dotenv from "dotenv";
 dotenv.config();

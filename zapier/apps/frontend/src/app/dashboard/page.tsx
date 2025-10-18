@@ -2,7 +2,7 @@
 import { Appbar } from "@/components/Appbar";
 import { DarkButton } from "@/components/buttons/DarkButton";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { BACKEND_URL, HOOKS_URL } from "../config";
 import { LinkButton } from "@/components/buttons/LinkButton";
 import { useRouter } from "next/navigation";
@@ -14,6 +14,7 @@ interface Zap {
   id: string;
   triggerId: string;
   userId: number;
+  date: Date;
   actions: {
     id: string;
     zapId: string;
@@ -62,12 +63,13 @@ function useZaps() {
   return {
     loading,
     zaps,
+    setZaps,
     error,
   };
 }
 
 export default function Page() {
-  const { loading, zaps, error } = useZaps();
+  const { loading, zaps, setZaps, error } = useZaps();
   const router = useRouter();
 
   return (
@@ -98,14 +100,20 @@ export default function Page() {
         </div>
       ) : (
         <div className="flex justify-center">
-          <ZapTable zaps={zaps} />
+          <ZapTable zaps={zaps} setZaps={setZaps} />
         </div>
       )}
     </div>
   );
 }
 
-function ZapTable({ zaps }: { zaps: Zap[] }) {
+function ZapTable({
+  zaps,
+  setZaps,
+}: {
+  zaps: Zap[];
+  setZaps: Dispatch<SetStateAction<Zap[]>>;
+}) {
   const router = useRouter();
 
   return (
@@ -115,6 +123,7 @@ function ZapTable({ zaps }: { zaps: Zap[] }) {
         <div className="flex-1">ID</div>
         <div className="flex-1">Created at</div>
         <div className="flex-1">Webhook URL</div>
+        <div className="flex-1">Delete</div>
         <div className="flex-1">Go</div>
       </div>
       {zaps.map((z) => (
@@ -139,12 +148,24 @@ function ZapTable({ zaps }: { zaps: Zap[] }) {
             ))}
           </div>
           <div className="flex-1">{z.id}</div>
-          <div className="flex-1">16 Oct, 2025</div>
-          {/* <div className="flex-1">{`${HOOKS_URL}/hooks/catch/${jwtDecode(localStorage.getItem("token") as string).id}/${z.id}`}</div> */}
+          <div className="flex-1">{new Date(z.date).toLocaleDateString()}</div>
+          <div className="flex-1">{`${HOOKS_URL}/hooks/catch/${jwtDecode(localStorage.getItem("token") as string).id}/${z.id}`}</div>
+          <div className="flex-1">
+            <LinkButton
+              onClick={async () => {
+                await axios.delete(`${BACKEND_URL}/api/v1/zap/` + z.id, {
+                  headers: { Authorization: localStorage.getItem("token") },
+                });
+                setZaps((s) => s.filter((zap) => zap.id !== z.id));
+              }}
+            >
+              Delete
+            </LinkButton>
+          </div>
           <div className="flex-1">
             <LinkButton
               onClick={() => {
-                router.push("/zap/" + z.id);
+                // router.push("/zap/" + z.id);
               }}
             >
               Go
