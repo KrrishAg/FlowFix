@@ -1,0 +1,43 @@
+("use server");
+
+import { Resend } from "resend";
+import dotenv from "dotenv";
+dotenv.config();
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+interface EmailData {
+  email: string;
+  message: string;
+}
+
+export async function sendEmail(emailData: EmailData) {
+  try {
+    const { email, message } = emailData;
+
+    const emailContent = `
+      <hr>
+      <p><strong>Message:</strong></p>
+      <p>${message.replace(/\n/g, "<br>")}</p>
+      <hr>
+    `;
+
+    console.log(email, message, emailContent);
+
+    const { data, error } = await resend.emails.send({
+      from: "Krrish <onboarding@resend.dev>",
+      to: [email],
+      subject: `Email from ZAPIER`,
+      html: emailContent,
+    });
+
+    if (error) {
+      return { success: false, error };
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    console.error("Email sending error:", error);
+    return { success: false, error: "Failed to send email. Please try again." };
+  }
+}

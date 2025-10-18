@@ -2,6 +2,7 @@ import { TOPIC_NAME } from "@repo/common/config";
 import prisma from "@repo/db/client";
 import { Kafka } from "kafkajs";
 import { parse } from "./parse.js";
+import { sendEmail } from "./email.js";
 
 //sent data this from postman, so this was stores aas zapRun's metadata
 // {
@@ -76,6 +77,7 @@ async function main() {
         const email = parse(actionMetadata?.email, zapRunDetails?.metadata);
         const body = parse(actionMetadata?.body, zapRunDetails?.metadata);
         console.log(`Sending out an email ${email} with the body ${body}`);
+        sendEmail({ email, message: body });
       }
       if (currAction.actionTypeId === "send-sol") {
         console.log(`Stage ${stage} running: Sending out solana`);
