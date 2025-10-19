@@ -1,5 +1,4 @@
 "use client";
-import { Appbar } from "@/components/Appbar";
 import { DarkButton } from "@/components/buttons/DarkButton";
 import axios from "axios";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";

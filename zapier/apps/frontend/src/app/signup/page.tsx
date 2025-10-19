@@ -1,5 +1,4 @@
 "use client";
-import { Appbar } from "@/components/Appbar";
 import { CheckFeature } from "@/components/CheckFeature";
 import { Input } from "@/components/Input";
 import { PrimaryButton } from "@/components/buttons/PrimaryButton";
@@ -35,7 +34,6 @@ export default function Page() {
               onChange={(e) => {
                 setName(e.target.value);
               }}
-              type="text"
               placeholder="Your name"
             ></Input>
             <Input
@@ -57,14 +55,11 @@ export default function Page() {
             <div className="pt-4">
               <PrimaryButton
                 onClick={async () => {
-                  const res = await axios.post(
-                    `${BACKEND_URL}/api/v1/user/signup`,
-                    {
-                      username: email,
-                      password,
-                      name,
-                    }
-                  );
+                  await axios.post(`${BACKEND_URL}/api/v1/user/signup`, {
+                    username: email,
+                    password,
+                    name,
+                  });
                   window.dispatchEvent(new Event("authChange"));
                   router.push("/login");
                 }}

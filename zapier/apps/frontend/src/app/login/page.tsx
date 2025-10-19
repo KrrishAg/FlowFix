@@ -1,5 +1,4 @@
 "use client";
-import { Appbar } from "@/components/Appbar";
 import { CheckFeature } from "@/components/CheckFeature";
 import { Input } from "@/components/Input";
 import { PrimaryButton } from "@/components/buttons/PrimaryButton";
