@@ -1,6 +1,6 @@
 "use client";
 
-import { BACKEND_URL } from "@/app/config";
+import useAuthRedirect, { BACKEND_URL } from "@/app/config";
 import Modal from "@/components/Modal";
 import { ZapCell } from "@/components/ZapCell";
 import { PrimaryButton } from "@/components/buttons/PrimaryButton";
@@ -33,6 +33,8 @@ function useAvailableActionsAndTriggers() {
 }
 
 export default function Page() {
+  useAuthRedirect();
+
   const router = useRouter();
   //get avl actions and triggers from backend
   const { availableActions, availableTriggers } =

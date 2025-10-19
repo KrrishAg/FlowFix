@@ -3,7 +3,7 @@ import { Appbar } from "@/components/Appbar";
 import { DarkButton } from "@/components/buttons/DarkButton";
 import axios from "axios";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { BACKEND_URL, HOOKS_URL } from "../config";
+import useAuthRedirect, { BACKEND_URL, HOOKS_URL } from "../config";
 import { LinkButton } from "@/components/buttons/LinkButton";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -69,6 +69,7 @@ function useZaps() {
 }
 
 export default function Page() {
+  useAuthRedirect();
   const { loading, zaps, setZaps, error } = useZaps();
   const router = useRouter();
 
@@ -114,6 +115,7 @@ function ZapTable({
   zaps: Zap[];
   setZaps: Dispatch<SetStateAction<Zap[]>>;
 }) {
+  useAuthRedirect();
   const router = useRouter();
 
   return (

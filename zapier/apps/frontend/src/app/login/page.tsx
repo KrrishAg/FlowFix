@@ -34,7 +34,6 @@ export default function Page() {
                 setEmail(e.target.value);
               }}
               label={"Email"}
-              type="text"
               placeholder="Your Email"
             ></Input>
             <Input
@@ -42,8 +41,8 @@ export default function Page() {
                 setPassword(e.target.value);
               }}
               label={"Password"}
-              type="password"
               placeholder="Password"
+              isPass
             ></Input>
             <div className="pt-4">
               <PrimaryButton
@@ -56,6 +55,7 @@ export default function Page() {
                     }
                   );
                   localStorage.setItem("token", res.data.token);
+                  window.dispatchEvent(new Event("authChange"));
                   router.push("/dashboard");
                 }}
                 size="big"
