@@ -1,9 +1,11 @@
 import prisma from "@repo/db/client";
 import express from "express";
+import cors from "cors";
 
 const app = express();
 
 app.use(express.json());
+app.use(cors());
 
 app.post("/hooks/catch/:userId/:zapId", async (req, res) => {
   const userId = req.params.userId;

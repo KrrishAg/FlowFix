@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Input } from "../Input";
-import { SecondaryButton } from "../buttons/SecondaryButton";
+import { PrimaryButton } from "../buttons/PrimaryButton";
 
 export const Solana = ({
   setMetadata,
@@ -21,13 +21,13 @@ export const Solana = ({
         placeholder="Text"
         onChange={(e) => setAmount(e.target.value)}
       />
-      <SecondaryButton
+      <PrimaryButton
         onClick={() => {
           setMetadata({ address, amount });
         }}
       >
         Submit
-      </SecondaryButton>
+      </PrimaryButton>
     </div>
   );
 };

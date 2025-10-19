@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Input } from "../Input";
-import { SecondaryButton } from "../buttons/SecondaryButton";
+import { PrimaryButton } from "../buttons/PrimaryButton";
 
 export const Email = ({
   setMetadata,
@@ -21,13 +21,13 @@ export const Email = ({
         placeholder="Text"
         onChange={(e) => setBody(e.target.value)}
       />
-      <SecondaryButton
+      <PrimaryButton
         onClick={() => {
           setMetadata({ email, body });
         }}
       >
         Submit
-      </SecondaryButton>
+      </PrimaryButton>
     </div>
   );
 };

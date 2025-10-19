@@ -7,6 +7,7 @@ import { LinkButton } from "@/components/buttons/LinkButton";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { jwtDecode } from "jwt-decode";
+import ModalZaprun from "@/components/ModalZaprun";
 
 //the type of data returned by the backend, got from postman
 interface Zap {
@@ -71,6 +72,14 @@ export default function Page() {
   useAuthRedirect();
   const { loading, zaps, setZaps, error } = useZaps();
   const router = useRouter();
+  const [selectedZapId, setSelectedZapId] = useState<string | null>(null);
+
+  function changeModalLayout() {
+    // if (text === null) {
+    // } else {
+    // }
+    setSelectedZapId(null);
+  }
 
   return (
     <div>
@@ -100,7 +109,12 @@ export default function Page() {
         </div>
       ) : (
         <div className="flex justify-center">
-          <ZapTable zaps={zaps} setZaps={setZaps} />
+          <ZapTable
+            zaps={zaps}
+            setZaps={setZaps}
+            setSelectedZapId={setSelectedZapId}
+          />
+          {selectedZapId && <ModalZaprun zapId={selectedZapId} onSelect={changeModalLayout} />}
         </div>
       )}
     </div>
@@ -110,9 +124,11 @@ export default function Page() {
 function ZapTable({
   zaps,
   setZaps,
+  setSelectedZapId,
 }: {
   zaps: Zap[];
   setZaps: Dispatch<SetStateAction<Zap[]>>;
+  setSelectedZapId: Dispatch<SetStateAction<string | null>>;
 }) {
   useAuthRedirect();
   const router = useRouter();
@@ -176,7 +192,7 @@ function ZapTable({
           <div className="flex-1">
             <LinkButton
               onClick={() => {
-                // router.push("/zap/" + z.id);
+                setSelectedZapId(z.id);
               }}
             >
               Go
