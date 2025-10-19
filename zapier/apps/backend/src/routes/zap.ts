@@ -65,6 +65,100 @@ zapRouter.post("/createZap", authMiddleware, async (req, res) => {
   }
 });
 
+//editing a zap
+zapRouter.post("/editZap/:zapId", authMiddleware, async (req, res) => {
+  try {
+    //@ts-ignore
+    const userId: string = req.id;
+    const body = req.body;
+    const parsedData = zapCreateSchema.safeParse(body);
+    const zapId: string = req.params.zapId || "";
+
+    if (!zapId) return res.status(411).json({ error: "No zap id found" });
+
+    if (!parsedData.success) {
+      console.log(parsedData.error);
+      return res
+        .status(411)
+        .json({ error: "Wrong data format sent for editing a zap" });
+    }
+
+    // await prisma.$transaction(async (tx) => {
+    //   const trigger = await tx.trigger.update({
+    //     where: {
+    //       zapId: zapId,
+    //     },
+    //     data: {
+    //       triggerTypeId: parsedData.data.availableTriggerId,
+    //     },
+    //   });
+
+    //   await tx.zap.update({
+    //     where: {
+    //       id: zapId,
+    //     },
+    //     data: {
+    //       date: new Date(),
+    //       actions: {
+    //         create: parsedData.data.actions.map((xx, idx) => ({
+    //           sortOrder: idx,
+    //           actionTypeId: xx.availableActionId,
+    //           metadata: xx.actionMetaData,
+    //         })),
+    //       },
+    //     },
+    //   });
+    // });
+    await prisma.$transaction(async (tx) => {
+      //updating available trigger type id
+      await tx.trigger.update({
+        where: {
+          zapId: zapId,
+        },
+        data: {
+          triggerTypeId: parsedData.data.availableTriggerId,
+        },
+      });
+
+      //updating zap date
+      await tx.zap.update({
+        where: {
+          id: zapId,
+        },
+        data: {
+          date: new Date(),
+        },
+      });
+
+      //deleting old actions associated with this zap
+      await tx.action.deleteMany({
+        where: {
+          zapId: zapId,
+        },
+      });
+
+      //creating new actiosns associated with this zap
+      await Promise.all(
+        parsedData.data.actions.map(async (act, idx) => {
+          return await tx.action.create({
+            data: {
+              zapId: zapId,
+              actionTypeId: act.availableActionId,
+              metadata: act.actionMetaData,
+              sortOrder: idx,
+            },
+          });
+        })
+      );
+    });
+
+    res.json({ zapId });
+  } catch (error) {
+    console.log("ERROR", error);
+    return res.status(404).json({ error });
+  }
+});
+
 //getting all the zaps for the logged in user
 zapRouter.get("/", authMiddleware, async (req, res) => {
   try {
