@@ -83,32 +83,6 @@ zapRouter.post("/editZap/:zapId", authMiddleware, async (req, res) => {
         .json({ error: "Wrong data format sent for editing a zap" });
     }
 
-    // await prisma.$transaction(async (tx) => {
-    //   const trigger = await tx.trigger.update({
-    //     where: {
-    //       zapId: zapId,
-    //     },
-    //     data: {
-    //       triggerTypeId: parsedData.data.availableTriggerId,
-    //     },
-    //   });
-
-    //   await tx.zap.update({
-    //     where: {
-    //       id: zapId,
-    //     },
-    //     data: {
-    //       date: new Date(),
-    //       actions: {
-    //         create: parsedData.data.actions.map((xx, idx) => ({
-    //           sortOrder: idx,
-    //           actionTypeId: xx.availableActionId,
-    //           metadata: xx.actionMetaData,
-    //         })),
-    //       },
-    //     },
-    //   });
-    // });
     await prisma.$transaction(async (tx) => {
       //updating available trigger type id
       await tx.trigger.update({

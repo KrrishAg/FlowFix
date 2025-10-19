@@ -123,6 +123,7 @@ function ZapTable({
         <div className="flex-1">ID</div>
         <div className="flex-1">Created at</div>
         <div className="flex-1">Webhook URL</div>
+        <div className="flex-1">Edit</div>
         <div className="flex-1">Delete</div>
         <div className="flex-1">Go</div>
       </div>
@@ -150,6 +151,15 @@ function ZapTable({
           <div className="flex-1">{z.id}</div>
           <div className="flex-1">{new Date(z.date).toLocaleDateString()}</div>
           <div className="flex-1">{`${HOOKS_URL}/hooks/catch/${jwtDecode(localStorage.getItem("token") as string).id}/${z.id}`}</div>
+          <div className="flex-1">
+            <LinkButton
+              onClick={async () => {
+                router.push(`/zap/edit/` + z.id);
+              }}
+            >
+              Edit
+            </LinkButton>
+          </div>
           <div className="flex-1">
             <LinkButton
               onClick={async () => {
