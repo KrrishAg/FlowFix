@@ -59,12 +59,11 @@ export default function ModalZaprun({
             <div>
               <textarea
                 onChange={(e) => setText(e.target.value)}
-                className="w-full h-50 px-3 py-1 text-lg my-4"
+                className="w-full h-50 px-3 py-1 text-lg my-4 border outline-0 border-red-400 focus:border-blue-400"
               />
               <PrimaryButton
                 onClick={() => {
-                  console.log(text);
-                  // console.log(JSON.parse(text));
+                  // console.log(text);
                   axios.post(
                     `${HOOKS_URL}/hooks/catch/${jwtDecode(localStorage.getItem("token") as string).id}/${zapId}`,
                     JSON.parse(text),

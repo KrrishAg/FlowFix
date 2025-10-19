@@ -114,7 +114,9 @@ export default function Page() {
             setZaps={setZaps}
             setSelectedZapId={setSelectedZapId}
           />
-          {selectedZapId && <ModalZaprun zapId={selectedZapId} onSelect={changeModalLayout} />}
+          {selectedZapId && (
+            <ModalZaprun zapId={selectedZapId} onSelect={changeModalLayout} />
+          )}
         </div>
       )}
     </div>
@@ -134,18 +136,21 @@ function ZapTable({
   const router = useRouter();
 
   return (
-    <div className="p-8 max-w-screen-lg w-full">
-      <div className="flex">
-        <div className="flex-1">Name</div>
-        <div className="flex-1">ID</div>
-        <div className="flex-1">Created at</div>
-        <div className="flex-1">Webhook URL</div>
-        <div className="flex-1">Edit</div>
-        <div className="flex-1">Delete</div>
-        <div className="flex-1">Go</div>
+    <div className="px-30">
+      <div className="mt-10 grid grid-cols-[3fr_3fr_3fr_9fr_2fr_2fr_2fr] justify-items-center border p-3">
+        <div className="col-span-1">Name</div>
+        <div className="col-span-1">ID</div>
+        <div className="col-span-1">Created at</div>
+        <div className="col-span-1">Webhook URL</div>
+        <div className="col-span-1">Edit</div>
+        <div className="col-span-1">Delete</div>
+        <div className="col-span-1">Go</div>
       </div>
       {zaps.map((z) => (
-        <div key={z.id} className="flex border-b border-t py-4">
+        <div
+          key={z.id}
+          className="grid grid-cols-[3fr_3fr_3fr_9fr_2fr_2fr_2fr] justify-items-center border p-3"
+        >
           <div className="flex-1 flex">
             <Image
               src={z.trigger.AvailableTrigger?.image}
