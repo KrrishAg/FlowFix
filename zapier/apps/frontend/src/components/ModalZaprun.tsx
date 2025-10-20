@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState} from "react";
 import axios from "axios";
 import { HOOKS_URL } from "@/app/config";
 import { jwtDecode } from "jwt-decode";
