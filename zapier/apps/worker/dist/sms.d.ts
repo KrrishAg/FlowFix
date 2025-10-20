@@ -1,4 +1,7 @@
-export declare function SMS({ smsData }: {
-    smsData: any;
-}): Promise<void>;
+interface SmsData {
+    phone: string;
+    message: string;
+}
+export declare function sendSms(smsData: SmsData): Promise<void>;
+export {};
 //# sourceMappingURL=sms.d.ts.map

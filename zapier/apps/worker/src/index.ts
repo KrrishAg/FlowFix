@@ -3,6 +3,7 @@ import prisma from "@repo/db/client";
 import { Kafka } from "kafkajs";
 import { parse } from "./parse.js";
 import { sendEmail } from "./email.js";
+import { sendSms } from "./sms.js";
 
 //sent data this from postman, so this was stores aas zapRun's metadata
 // {
@@ -85,6 +86,14 @@ async function main() {
         const address = parse(actionMetadata?.address, zapRunDetails?.metadata);
         const amount = parse(actionMetadata?.amount, zapRunDetails?.metadata);
         console.log(`Sending out SOLana of quantity ${amount} to ${address}`);
+      }
+      if (currAction.actionTypeId === "sms") {
+        console.log(`Stage ${stage} running: Sending out an sms`);
+
+        const phone = parse(actionMetadata?.phone, zapRunDetails?.metadata);
+        const body = parse(actionMetadata?.body, zapRunDetails?.metadata);
+        console.log(`Sending out sms to ${phone} with message ${body}`);
+        sendSms({ phone, message: body });
       }
 
       await new Promise((resolve) => setTimeout(resolve, 500));

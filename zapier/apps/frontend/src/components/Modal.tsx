@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { Email } from "./selectors/Email";
 import { Solana } from "./selectors/Solana";
+import { Sms } from "./selectors/Sms";
 
 export default function Modal({
   index,
@@ -119,6 +120,17 @@ export default function Modal({
             {step === 1 && selectedAction?.id === "send-sol" && (
               <div>
                 <Solana
+                  setMetadata={(metadata) => {
+                    onSelect({ ...selectedAction, metadata });
+                  }}
+                />
+              </div>
+            )}
+
+            {/* if next step, checked by step variable, and matches sms */}
+            {step === 1 && selectedAction?.id === "sms" && (
+              <div>
+                <Sms
                   setMetadata={(metadata) => {
                     onSelect({ ...selectedAction, metadata });
                   }}
