@@ -1,11 +1,10 @@
 "use client";
 
-import { useState} from "react";
+import { useState } from "react";
 import axios from "axios";
 import { HOOKS_URL } from "@/app/config";
 import { jwtDecode } from "jwt-decode";
 import { PrimaryButton } from "./buttons/PrimaryButton";
-import { EnhancedTextarea } from "./TextArea";
 
 export default function ModalZaprun({
   zapId,
@@ -58,11 +57,10 @@ export default function ModalZaprun({
           {/* <!-- Modal body --> */}
           <div className="p-5 flex flex-col gap-5">
             <div>
-              {/* <textarea
+              <textarea
                 onChange={(e) => setText(e.target.value)}
                 className="w-full h-50 px-3 py-1 text-lg my-4 border outline-0 border-red-400 focus:border-blue-400"
-              /> */}
-              <EnhancedTextarea />
+              />
               <PrimaryButton
                 onClick={() => {
                   // console.log(text);

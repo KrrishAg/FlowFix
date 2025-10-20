@@ -1,7 +1,0 @@
-[?9001h[?1004h[?25l[2J[m[H]0;npm[?25h]0;npm run dev[?25l
-> frontend@0.1.0 dev
-> next dev --turbopack[5;1H[?25h[K]0;C:\WINDOWS\system32\cmd.exe ]0;next-server (v15.5.4) [33m[1m⚠[m Port 3000 is in use by process 3628, using available port 3002 instead.
-   [38;2;173;127;168m[1m▲ Next.js 15.5.4[m (Turbopack)
-[?25l   - Local:        http://localhost:3002
-   - Network:      http://172.25.0.1:3002[10;1H [32m[1m✓[m Starting...
-[?25h [32m[1m✓[m Ready in 1326ms
