@@ -6,6 +6,7 @@ import { sendEmail } from "./email.js";
 import { sendSms } from "./sms.js";
 import { sendDiscordMessage } from "./discord.js";
 import { sendAPIReq } from "./apireq.js";
+import { sendTelegramMessage } from "./telegram.js";
 
 //sent data this from postman, so this was stores aas zapRun's metadata
 // {
@@ -119,9 +120,6 @@ async function main() {
       if (currAction.actionTypeId === "apireq") {
         console.log(`Stage ${stage} running: Hitting an api endpoint`);
 
-        console.log(actionMetadata);
-        console.log(zapRunDetails);
-
         const url = parse(actionMetadata?.url, zapRunDetails?.metadata);
         const method = parse(actionMetadata?.method, zapRunDetails?.metadata);
 
@@ -158,6 +156,20 @@ async function main() {
           //@ts-ignore
           body: parsedBody,
         });
+      }
+
+      if (currAction.actionTypeId === "telegram") {
+        console.log(`Stage ${stage} running: Sending out a telegram message`);
+
+        const botToken = parse(
+          actionMetadata?.botToken,
+          zapRunDetails?.metadata
+        );
+        const chatId = parse(actionMetadata?.chatId, zapRunDetails?.metadata);
+        const message = parse(actionMetadata?.message, zapRunDetails?.metadata);
+
+        console.log(`Sending out telegram with message ${message}`);
+        sendTelegramMessage({ botToken, chatId, message });
       }
 
       await new Promise((resolve) => setTimeout(resolve, 500));
