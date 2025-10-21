@@ -5,6 +5,7 @@ import { parse } from "./parse.js";
 import { sendEmail } from "./email.js";
 import { sendSms } from "./sms.js";
 import { sendDiscordMessage } from "./discord.js";
+import { sendAPIReq } from "./apireq.js";
 
 //sent data this from postman, so this was stores aas zapRun's metadata
 // {
@@ -113,6 +114,50 @@ async function main() {
           `Sending out discord message to webhook url: ${url} with message ${message}`
         );
         sendDiscordMessage({ url, message, hyperlink, title });
+      }
+
+      if (currAction.actionTypeId === "apireq") {
+        console.log(`Stage ${stage} running: Hitting an api endpoint`);
+
+        console.log(actionMetadata);
+        console.log(zapRunDetails);
+
+        const url = parse(actionMetadata?.url, zapRunDetails?.metadata);
+        const method = parse(actionMetadata?.method, zapRunDetails?.metadata);
+
+        let parsedHeaders = {};
+        if (actionMetadata?.headers) {
+          for (const [key, value] of Object.entries(
+            JSON.parse(actionMetadata?.headers)
+          )) {
+            //@ts-ignore
+            parsedHeaders[key] = parse(
+              value as string,
+              zapRunDetails?.metadata
+            );
+          }
+        }
+
+        let parsedBody = {};
+        if (actionMetadata?.body) {
+          for (const [key, value] of Object.entries(
+            JSON.parse(actionMetadata?.body)
+          )) {
+            //@ts-ignore
+            parsedBody[key] = parse(value as string, zapRunDetails?.metadata);
+          }
+        }
+        console.log(
+          `Trying to hit an api endpoint: ${url}, method ${method} with headers ${parsedHeaders} and body ${parsedBody}`
+        );
+        sendAPIReq({
+          url,
+          method,
+          //@ts-ignore
+          headers: parsedHeaders,
+          //@ts-ignore
+          body: parsedBody,
+        });
       }
 
       await new Promise((resolve) => setTimeout(resolve, 500));
