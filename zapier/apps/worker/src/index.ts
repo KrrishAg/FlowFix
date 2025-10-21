@@ -4,6 +4,7 @@ import { Kafka } from "kafkajs";
 import { parse } from "./parse.js";
 import { sendEmail } from "./email.js";
 import { sendSms } from "./sms.js";
+import { sendDiscordMessage } from "./discord.js";
 
 //sent data this from postman, so this was stores aas zapRun's metadata
 // {
@@ -94,6 +95,24 @@ async function main() {
         const body = parse(actionMetadata?.body, zapRunDetails?.metadata);
         console.log(`Sending out sms to ${phone} with message ${body}`);
         sendSms({ phone, message: body });
+      }
+      if (currAction.actionTypeId === "discord") {
+        console.log(`Stage ${stage} running: Sending out a discord message`);
+
+        console.log(actionMetadata);
+
+        const url = parse(actionMetadata?.url, zapRunDetails?.metadata);
+        const message = parse(actionMetadata?.message, zapRunDetails?.metadata);
+        const hyperlink = parse(
+          actionMetadata?.hyperlink,
+          zapRunDetails?.metadata
+        );
+        const title = parse(actionMetadata?.title, zapRunDetails?.metadata);
+        console.log(url, message, hyperlink, title);
+        console.log(
+          `Sending out discord message to webhook url: ${url} with message ${message}`
+        );
+        sendDiscordMessage({ url, message, hyperlink, title });
       }
 
       await new Promise((resolve) => setTimeout(resolve, 500));

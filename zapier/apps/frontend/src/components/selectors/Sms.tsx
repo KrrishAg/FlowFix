@@ -17,7 +17,7 @@ export const Sms = ({
           placeholder="Receiver's phone number"
           onChange={(e) => setPhone(e.target.value)}
         />
-        <p className="text-sm">*Will be sent to Krrish's personal number</p>
+        <p className="text-sm">*Will be sent to Krrish_s personal number</p>
         <Input
           label="Message: "
           placeholder="Type message..."

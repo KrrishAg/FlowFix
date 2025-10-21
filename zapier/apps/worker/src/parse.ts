@@ -4,6 +4,7 @@ export function parse(
   firstChar = "{",
   lastChar = "}"
 ) {
+  if (!text) return "";
   const n = text.length;
   let st = 0,
     finalRes = "";

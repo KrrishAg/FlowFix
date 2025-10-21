@@ -1,8 +1,12 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef } from "react";
 
-export const EnhancedTextarea = () => {
+export const EnhancedTextarea = ({
+  setText,
+}: {
+  setText: Dispatch<SetStateAction<string>>;
+}) => {
   // By adding <HTMLTextAreaElement>, we tell React/TypeScript what this ref will hold.
   const editorRef = useRef<HTMLTextAreaElement>(null);
 
@@ -72,6 +76,7 @@ export const EnhancedTextarea = () => {
 
       <textarea
         ref={editorRef}
+        onChange={(e) => setText(e.target.value)}
         className="code-editor w-full h-96 p-4 rounded-lg border-2 transition duration-200"
         placeholder="Type your code or text here..."
       ></textarea>
