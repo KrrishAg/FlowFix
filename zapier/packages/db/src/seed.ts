@@ -36,6 +36,15 @@ async function main() {
         "https://media.istockphoto.com/id/1047557398/vector/chat-bubble-message-vector-icon-or-typing-chat-or-comment-notification.jpg?s=612x612&w=0&k=20&c=r3ixDRcehZq1Mh9kgRqfuzn3e11MPP5w7CjoFjHkzkk=",
     },
   });
+
+  await prisma.availableAction.create({
+    data: {
+      id: "discord",
+      name: "Discord Message",
+      image:
+        "https://images-eds-ssl.xboxlive.com/image?url=4rt9.lXDC4H_93laV1_eHHFT949fUipzkiFOBH3fAiZZUCdYojwUyX2aTonS1aIwMrx6NUIsHfUHSLzjGJFxxsG72wAo9EWJR4yQWyJJaDaK1XdUso6cUMpI9hAdPUU_FNs11cY1X284vsHrnWtRw7oqRpN1m9YAg21d_aNKnIo-&format=source",
+    },
+  });
 }
 
 main();

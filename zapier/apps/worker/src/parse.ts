@@ -4,7 +4,6 @@ export function parse(
   firstChar = "{",
   lastChar = "}"
 ) {
-  if (!text) return "";
   const n = text.length;
   let st = 0,
     finalRes = "";
@@ -17,16 +16,21 @@ export function parse(
       }
       const tmpStrArray = text.slice(st + 1, end).split(".");
       let localValues = { ...values };
-      //going in depth of the values object
-      for (const x of tmpStrArray) {
-        localValues = localValues[x];
+      let next = true;
+      for (let i = 0; i < tmpStrArray.length && next; i++) {
+        const x = tmpStrArray[i] as string;
+        if (localValues[x]) {
+          localValues = localValues[x];
+        } else {
+          finalRes += " ";
+          next = false;
+        }
       }
-      finalRes += localValues;
+      if (next) finalRes += localValues;
       st = end + 1;
     } else {
       finalRes += text.charAt(st);
       st++;
-      //   end++;
     }
   }
   return finalRes;
