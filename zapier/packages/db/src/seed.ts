@@ -54,6 +54,14 @@ async function main() {
         "https://pngdownload.io/wp-content/uploads/2025/07/Telegram-Logo-Icon-Messaging-App.webp",
     },
   });
+
+  await prisma.availableAction.create({
+    data: {
+      id: "apireq",
+      name: "HTTP Endpoint",
+      image: "https://cdn-icons-png.flaticon.com/512/3165/3165065.png",
+    },
+  });
 }
 
 main();

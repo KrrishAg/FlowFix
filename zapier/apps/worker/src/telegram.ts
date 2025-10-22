@@ -13,10 +13,6 @@ export async function sendTelegramMessage(data: TelegramType) {
     if (!chatId) chatId = process.env.TELEGRAM_CHATID || "";
     if (!message) message = "This is the default message, ENJOY :D";
 
-    console.log("botToken", botToken);
-    console.log("chatId", chatId);
-    console.log("message", message);
-    
     const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
 
     const res = await axios.post(url, {
@@ -26,6 +22,6 @@ export async function sendTelegramMessage(data: TelegramType) {
 
     console.log("Telegram message sent:", res.data);
   } catch (error: any) {
-    console.error("Telegram action failed:", error?.response);
+    console.error("Telegram action failed:", error);
   }
 }
