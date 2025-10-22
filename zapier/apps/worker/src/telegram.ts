@@ -1,12 +1,12 @@
 import axios from "axios";
 
-interface TelegramType {
+interface TelegramDatatype {
   botToken: string;
   chatId: string;
   message: string;
 }
 
-export async function sendTelegramMessage(data: TelegramType) {
+export async function sendTelegramMessage(data: TelegramDatatype) {
   try {
     let { botToken, chatId, message } = data;
     if (!botToken) botToken = process.env.TELEGRAM_BOT_TOKEN || "";

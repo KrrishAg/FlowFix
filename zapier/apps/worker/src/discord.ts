@@ -1,13 +1,13 @@
 import axios from "axios";
 
-interface DiscordType {
+interface DiscordDatatype {
   url: string;
   message: string;
   hyperlink?: string;
   title?: string;
 }
 
-export async function sendDiscordMessage(data: DiscordType) {
+export async function sendDiscordMessage(data: DiscordDatatype) {
   try {
     console.log("DATA", data);
     const url = data.url || process.env.DISCORD_WEBHOOK_URL || "";

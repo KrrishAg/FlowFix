@@ -8,6 +8,7 @@ import { Sms } from "./selectors/Sms";
 import { Discord } from "./selectors/Discord";
 import { Apireq } from "./selectors/Apireq";
 import { Telegram } from "./selectors/Telegram";
+import { Filter } from "./selectors/Filter";
 
 export default function Modal({
   index,
@@ -167,6 +168,17 @@ export default function Modal({
             {step === 1 && selectedAction?.id === "telegram" && (
               <div>
                 <Telegram
+                  setMetadata={(metadata) => {
+                    onSelect({ ...selectedAction, metadata });
+                  }}
+                />
+              </div>
+            )}
+
+            {/* if next step, checked by step variable, and matches filter*/}
+            {step === 1 && selectedAction?.id === "filter" && (
+              <div>
+                <Filter
                   setMetadata={(metadata) => {
                     onSelect({ ...selectedAction, metadata });
                   }}

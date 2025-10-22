@@ -4,14 +4,14 @@ import axios from "axios";
 import dotenv from "dotenv";
 dotenv.config();
 
-interface ApiData {
+interface ApiDatatype {
   url: string;
   method: string;
   headers?: Record<string, string>;
   body?: any;
 }
 
-export async function sendAPIReq(apiData: ApiData) {
+export async function sendAPIReq(apiData: ApiDatatype) {
   try {
     let { url, method, headers = {}, body = {} } = apiData;
 

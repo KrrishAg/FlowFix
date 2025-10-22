@@ -17,7 +17,7 @@ export const Input = ({
   return (
     <div className="relative">
       <div className="text-sm pb-1 pt-2">
-        <label className="text-lg">{label}</label>
+        <label className="text-base font-medium">{label}</label>
       </div>
       <input
         className="border rounded px-4 py-2 w-full border-black"

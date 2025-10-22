@@ -7,6 +7,7 @@ import { sendSms } from "./sms.js";
 import { sendDiscordMessage } from "./discord.js";
 import { sendAPIReq } from "./apireq.js";
 import { sendTelegramMessage } from "./telegram.js";
+import { sendDataToFilter } from "./filter.js";
 
 //sent data this from postman, so this was stores aas zapRun's metadata
 // {
@@ -172,13 +173,48 @@ async function main() {
         sendTelegramMessage({ botToken, chatId, message });
       }
 
+      let res = true;
+      if (currAction.actionTypeId === "filter") {
+        console.log(
+          `Stage ${stage} running: Filtering based on the user inputs and conditions`
+        );
+
+        console.log(actionMetadata);
+        console.log(zapRunDetails?.metadata);
+
+        const logic = parse(actionMetadata?.logic, zapRunDetails?.metadata);
+        console.log(logic);
+        let condition1 = {};
+        if (actionMetadata?.condition1) {
+          for (const [key, value] of Object.entries(
+            actionMetadata?.condition1
+          )) {
+            //@ts-ignore
+            condition1[key] = parse(value as string, zapRunDetails?.metadata);
+          }
+        }
+        let condition2 = {};
+        if (actionMetadata?.condition2) {
+          for (const [key, value] of Object.entries(
+            actionMetadata?.condition2
+          )) {
+            //@ts-ignore
+            condition2[key] = parse(value as string, zapRunDetails?.metadata);
+          }
+        }
+
+        console.log(`Sending the data for filtering`);
+        //@ts-ignore
+        res = sendDataToFilter({ logic, condition1, condition2 });
+      }
+
       await new Promise((resolve) => setTimeout(resolve, 500));
 
       console.log("PROCESS DONE");
 
       const lastStage = (zapRunDetails?.zap.actions.length || 1) - 1; //figuring out the last sortorder which tells if there is any further action for that zap
 
-      if (stage !== lastStage) {
+      if (stage !== lastStage && res) {
         await producer.send({
           topic: TOPIC_NAME,
           messages: [
@@ -187,6 +223,8 @@ async function main() {
             },
           ],
         });
+      } else if (!res) {
+        console.log("ZAP RUN STOPPED DUE TO FALSE FILTER CONDITION");
       } else {
         console.log("THIS IS THE LAST STAGE");
       }

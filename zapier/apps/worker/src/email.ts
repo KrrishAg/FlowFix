@@ -8,12 +8,12 @@ dotenv.config();
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-interface EmailData {
+interface EmailDatatype {
   email: string;
   message: string;
 }
 
-export async function sendEmail(emailData: EmailData) {
+export async function sendEmail(emailData: EmailDatatype) {
   try {
     const { email, message } = emailData;
 

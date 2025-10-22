@@ -2,12 +2,12 @@ import dotenv from "dotenv";
 import twilio from "twilio";
 dotenv.config();
 
-interface SmsData {
+interface SmsDatatype {
   phone: string;
   message: string;
 }
 
-export async function sendSms(smsData: SmsData) {
+export async function sendSms(smsData: SmsDatatype) {
   try {
     const accountSid = process.env.TWILIO_ACCOUNT_SID;
     const authToken = process.env.TWILIO_AUTHTOKEN;
