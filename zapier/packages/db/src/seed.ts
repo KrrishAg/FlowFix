@@ -62,6 +62,15 @@ async function main() {
       image: "https://cdn-icons-png.flaticon.com/512/3165/3165065.png",
     },
   });
+
+  await prisma.availableAction.create({
+    data: {
+      id: "filter",
+      name: "Filter Condition",
+      image:
+        "https://img.freepik.com/free-photo/filter-icon-front-side_187299-45145.jpg?semt=ais_hybrid&w=740&q=80",
+    },
+  });
 }
 
 main();
