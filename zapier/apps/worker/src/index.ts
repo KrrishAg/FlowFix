@@ -8,6 +8,7 @@ import { sendDiscordMessage } from "./discord.js";
 import { sendAPIReq } from "./apireq.js";
 import { sendTelegramMessage } from "./telegram.js";
 import { sendDataToFilter } from "./filter.js";
+import { sendRazorpay } from "./razorpay.js";
 
 //sent data this from postman, so this was stores aas zapRun's metadata
 // {
@@ -218,9 +219,7 @@ async function main() {
         res = sendDataToFilter({ logic, condition1, condition2 });
       }
 
-      const extra = {
-        check: 123,
-      };
+      const extra = {};
       if (currAction.actionTypeId === "razorpay") {
         console.log(`Stage ${stage} running: Creatiing a new razorpay link`);
 
@@ -253,7 +252,16 @@ async function main() {
 
         console.log(`Sending the data to create razorpay link`);
         //@ts-ignore
-        // res = sendDataToFilter({ logic, condition1, condition2 });
+        const razorpayUrl = await sendRazorpay({
+          keyId,
+          keySecret,
+          amntInPaise,
+          description,
+          custName,
+          custEmail,
+        });
+        //@ts-ignore
+        extra["razorpayUrl"] = razorpayUrl;
       }
 
       await new Promise((resolve) => setTimeout(resolve, 500));

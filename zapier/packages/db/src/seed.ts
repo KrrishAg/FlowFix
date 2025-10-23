@@ -71,6 +71,15 @@ async function main() {
         "https://img.freepik.com/free-photo/filter-icon-front-side_187299-45145.jpg?semt=ais_hybrid&w=740&q=80",
     },
   });
+
+  await prisma.availableAction.create({
+    data: {
+      id: "razorpay",
+      name: "Create Razorpay Link",
+      image:
+        "https://play-lh.googleusercontent.com/2BQu8Y7Ah9Gh9CZvmaMSYIcZvdO4KfdJ26EZ1WGyaOG_xxeDxNn-AZYxOtQJvyQQPFY",
+    },
+  });
 }
 
 main();

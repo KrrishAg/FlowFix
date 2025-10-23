@@ -9,6 +9,7 @@ import { Discord } from "./selectors/Discord";
 import { Apireq } from "./selectors/Apireq";
 import { Telegram } from "./selectors/Telegram";
 import { Filter } from "./selectors/Filter";
+import { Razorpay } from "./selectors/Razorpay";
 
 export default function Modal({
   index,
@@ -179,6 +180,17 @@ export default function Modal({
             {step === 1 && selectedAction?.id === "filter" && (
               <div>
                 <Filter
+                  setMetadata={(metadata) => {
+                    onSelect({ ...selectedAction, metadata });
+                  }}
+                />
+              </div>
+            )}
+
+            {/* if next step, checked by step variable, and matches razorpay*/}
+            {step === 1 && selectedAction?.id === "razorpay" && (
+              <div>
+                <Razorpay
                   setMetadata={(metadata) => {
                     onSelect({ ...selectedAction, metadata });
                   }}
