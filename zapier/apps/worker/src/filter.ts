@@ -20,8 +20,9 @@ const OPERATORS = {
   text_starts_with: (a: string, b: string) => a.startsWith(b),
   number_greater_than: (a: string, b: string) => Number(a) > Number(b),
   number_less_than: (a: string, b: string) => Number(a) < Number(b),
+  number_equal_to: (a: string, b: string) => Number(a) === Number(b),
   date_is_after: (a: string, b: string) => new Date(a) > new Date(b),
-  exists: (a: any) => a !== null && a !== undefined,
+  exists: (a: any, _: any) => a !== null && a !== undefined,
 };
 
 export function sendDataToFilter(filterData: FilterDatatype) {

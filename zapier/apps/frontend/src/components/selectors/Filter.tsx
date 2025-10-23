@@ -26,6 +26,7 @@ export const Filter = ({
     "text_starts_with",
     "number_greater_than",
     "number_less_than",
+    "number_equal_to",
     "date_is_after",
     "exists",
   ];

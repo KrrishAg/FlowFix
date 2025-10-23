@@ -47,6 +47,7 @@ async function main() {
       if (!message.value?.toString()) return;
 
       const parsedData = JSON.parse(message.value?.toString());
+      console.log("PARSED DATA", parsedData);
       const zapRunId = parsedData.zapRunId;
       const stage = parsedData.stage; //this stage tells which action is/should currently be run
 
