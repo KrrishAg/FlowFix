@@ -3,7 +3,7 @@ import { authMiddleware } from "../middleware.js";
 import { zapCreateSchema } from "../types/index.js";
 import prisma from "@repo/db/client";
 
-const zapRouter = express.Router();
+export const zapRouter = express.Router();
 
 //creating a zap
 zapRouter.post("/createZap", authMiddleware, async (req, res) => {
@@ -216,4 +216,3 @@ zapRouter.delete("/:zapid", authMiddleware, async (req, res) => {
   }
 });
 
-export default zapRouter;

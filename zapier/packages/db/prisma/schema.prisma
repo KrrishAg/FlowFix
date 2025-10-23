@@ -77,7 +77,7 @@ model ZapRunOutbox {
 model UserCredentials {
   id            String @id @default(uuid())
   userId        Int
-  User User     @relation(fields: [userId], references: [id])
+  User User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   service       String
   apikey        String
 }

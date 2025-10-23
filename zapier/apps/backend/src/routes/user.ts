@@ -5,7 +5,7 @@ import prisma from "@repo/db/client";
 import jwt from "jsonwebtoken";
 import { jwtsecret } from "../config.js";
 
-const userRouter = express.Router();
+export const userRouter = express.Router();
 
 userRouter.post("/signup", async (req, res) => {
   try {
@@ -99,4 +99,3 @@ userRouter.get("/", authMiddleware, async (req, res) => {
   }
 });
 
-export default userRouter;
