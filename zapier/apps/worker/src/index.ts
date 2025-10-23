@@ -73,6 +73,24 @@ async function main() {
         return;
       }
 
+      //TILL NOW zapRunDetails?.metadata for the values in the parse function was fine but WITH INTRO of Razorpay, I need link as well which is there in parsedObject, as I put it there while producing the next stage
+      let metadataObject = {};
+
+      // This 'if' block safely checks if Metadata is *actually* an object
+      if (
+        zapRunDetails?.metadata &&
+        typeof zapRunDetails.metadata === "object"
+      ) {
+        // If it's a real object, assign it
+        metadataObject = zapRunDetails.metadata;
+      }
+
+      // 4. Now, you can safely combine them!
+      const combinedObject = {
+        ...parsedData,
+        ...metadataObject, // This is now guaranteed to be an object
+      };
+
       const actionMetadata = currAction.metadata as
         | Record<string, any>
         | undefined;
@@ -80,23 +98,23 @@ async function main() {
       if (currAction.actionTypeId === "email") {
         console.log(`Stage ${stage} running: Sending out an email`);
 
-        const email = parse(actionMetadata?.email, zapRunDetails?.metadata);
-        const body = parse(actionMetadata?.body, zapRunDetails?.metadata);
+        const email = parse(actionMetadata?.email, combinedObject);
+        const body = parse(actionMetadata?.body, combinedObject);
         console.log(`Sending out an email ${email} with the body ${body}`);
         sendEmail({ email, message: body });
       }
       if (currAction.actionTypeId === "send-sol") {
         console.log(`Stage ${stage} running: Sending out solana`);
 
-        const address = parse(actionMetadata?.address, zapRunDetails?.metadata);
-        const amount = parse(actionMetadata?.amount, zapRunDetails?.metadata);
+        const address = parse(actionMetadata?.address, combinedObject);
+        const amount = parse(actionMetadata?.amount, combinedObject);
         console.log(`Sending out SOLana of quantity ${amount} to ${address}`);
       }
       if (currAction.actionTypeId === "sms") {
         console.log(`Stage ${stage} running: Sending out an sms`);
 
-        const phone = parse(actionMetadata?.phone, zapRunDetails?.metadata);
-        const body = parse(actionMetadata?.body, zapRunDetails?.metadata);
+        const phone = parse(actionMetadata?.phone, combinedObject);
+        const body = parse(actionMetadata?.body, combinedObject);
         console.log(`Sending out sms to ${phone} with message ${body}`);
         sendSms({ phone, message: body });
       }
@@ -105,13 +123,10 @@ async function main() {
 
         console.log(actionMetadata);
 
-        const url = parse(actionMetadata?.url, zapRunDetails?.metadata);
-        const message = parse(actionMetadata?.message, zapRunDetails?.metadata);
-        const hyperlink = parse(
-          actionMetadata?.hyperlink,
-          zapRunDetails?.metadata
-        );
-        const title = parse(actionMetadata?.title, zapRunDetails?.metadata);
+        const url = parse(actionMetadata?.url, combinedObject);
+        const message = parse(actionMetadata?.message, combinedObject);
+        const hyperlink = parse(actionMetadata?.hyperlink, combinedObject);
+        const title = parse(actionMetadata?.title, combinedObject);
         console.log(url, message, hyperlink, title);
         console.log(
           `Sending out discord message to webhook url: ${url} with message ${message}`
@@ -122,8 +137,8 @@ async function main() {
       if (currAction.actionTypeId === "apireq") {
         console.log(`Stage ${stage} running: Hitting an api endpoint`);
 
-        const url = parse(actionMetadata?.url, zapRunDetails?.metadata);
-        const method = parse(actionMetadata?.method, zapRunDetails?.metadata);
+        const url = parse(actionMetadata?.url, combinedObject);
+        const method = parse(actionMetadata?.method, combinedObject);
 
         let parsedHeaders = {};
         if (actionMetadata?.headers) {
@@ -131,10 +146,7 @@ async function main() {
             JSON.parse(actionMetadata?.headers)
           )) {
             //@ts-ignore
-            parsedHeaders[key] = parse(
-              value as string,
-              zapRunDetails?.metadata
-            );
+            parsedHeaders[key] = parse(value as string, combinedObject);
           }
         }
 
@@ -144,7 +156,7 @@ async function main() {
             JSON.parse(actionMetadata?.body)
           )) {
             //@ts-ignore
-            parsedBody[key] = parse(value as string, zapRunDetails?.metadata);
+            parsedBody[key] = parse(value as string, combinedObject);
           }
         }
         console.log(
@@ -163,12 +175,9 @@ async function main() {
       if (currAction.actionTypeId === "telegram") {
         console.log(`Stage ${stage} running: Sending out a telegram message`);
 
-        const botToken = parse(
-          actionMetadata?.botToken,
-          zapRunDetails?.metadata
-        );
-        const chatId = parse(actionMetadata?.chatId, zapRunDetails?.metadata);
-        const message = parse(actionMetadata?.message, zapRunDetails?.metadata);
+        const botToken = parse(actionMetadata?.botToken, combinedObject);
+        const chatId = parse(actionMetadata?.chatId, combinedObject);
+        const message = parse(actionMetadata?.message, combinedObject);
 
         console.log(`Sending out telegram with message ${message}`);
         sendTelegramMessage({ botToken, chatId, message });
@@ -181,9 +190,9 @@ async function main() {
         );
 
         console.log(actionMetadata);
-        console.log(zapRunDetails?.metadata);
+        console.log(combinedObject);
 
-        const logic = parse(actionMetadata?.logic, zapRunDetails?.metadata);
+        const logic = parse(actionMetadata?.logic, combinedObject);
         console.log(logic);
         let condition1 = {};
         if (actionMetadata?.condition1) {
@@ -191,7 +200,7 @@ async function main() {
             actionMetadata?.condition1
           )) {
             //@ts-ignore
-            condition1[key] = parse(value as string, zapRunDetails?.metadata);
+            condition1[key] = parse(value as string, combinedObject);
           }
         }
         let condition2 = {};
@@ -200,13 +209,51 @@ async function main() {
             actionMetadata?.condition2
           )) {
             //@ts-ignore
-            condition2[key] = parse(value as string, zapRunDetails?.metadata);
+            condition2[key] = parse(value as string, combinedObject);
           }
         }
 
         console.log(`Sending the data for filtering`);
         //@ts-ignore
         res = sendDataToFilter({ logic, condition1, condition2 });
+      }
+
+      const extra = {
+        check: 123,
+      };
+      if (currAction.actionTypeId === "razorpay") {
+        console.log(`Stage ${stage} running: Creatiing a new razorpay link`);
+
+        console.log(actionMetadata);
+        console.log(zapRunDetails?.metadata);
+
+        const keyId = parse(actionMetadata?.keyId, zapRunDetails?.metadata);
+        const keySecret = parse(
+          actionMetadata?.keySecret,
+          zapRunDetails?.metadata
+        );
+        const amntInPaise = parse(
+          actionMetadata?.amntInPaise,
+          zapRunDetails?.metadata
+        );
+        const description = parse(
+          actionMetadata?.description,
+          zapRunDetails?.metadata
+        );
+        const custName = parse(
+          actionMetadata?.custName,
+          zapRunDetails?.metadata
+        );
+        const custEmail = parse(
+          actionMetadata?.custEmail,
+          zapRunDetails?.metadata
+        );
+
+        console.log();
+
+        console.log(`Sending the data to create razorpay link`);
+        //@ts-ignore
+        // res = sendDataToFilter({ logic, condition1, condition2 });
       }
 
       await new Promise((resolve) => setTimeout(resolve, 500));
@@ -220,7 +267,12 @@ async function main() {
           topic: TOPIC_NAME,
           messages: [
             {
-              value: JSON.stringify({ zapRunId, stage: stage + 1 }),
+              value: JSON.stringify({
+                ...parsedData,
+                ...extra,
+                zapRunId,
+                stage: stage + 1,
+              }),
             },
           ],
         });
