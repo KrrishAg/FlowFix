@@ -8,11 +8,12 @@ datasource db {
 }
 
 model User {
-  id              Int               @id @default(autoincrement())
-  name            String
-  password        String
-  email           String
-  zaps            Zap[]
+  id                Int               @id @default(autoincrement())
+  name              String
+  password          String
+  email             String
+  zaps              Zap[]
+  userCredentials   UserCredentials[]
 }
 
 model Zap {
@@ -70,4 +71,13 @@ model ZapRunOutbox {
   id       String @id @default(uuid())
   zapRunId String @unique
   zapRun   ZapRun @relation(fields: [zapRunId], references: [id])
+}
+
+
+model UserCredentials {
+  id            String @id @default(uuid())
+  userId        Int
+  User User     @relation(fields: [userId], references: [id])
+  service       String
+  apikey        String
 }
