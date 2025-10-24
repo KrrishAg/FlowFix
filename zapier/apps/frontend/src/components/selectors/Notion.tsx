@@ -3,7 +3,6 @@ import { Input } from "../Input";
 import { PrimaryButton } from "../buttons/PrimaryButton";
 import axios from "axios";
 import { BACKEND_URL } from "@/app/config";
-import { Select } from "../Select";
 
 export const Notion = ({
   setMetadata,
@@ -25,6 +24,7 @@ export const Notion = ({
       type: string;
     }[]
   >([]);
+  const [values, setValues] = useState<Record<string, string>>({});
 
   async function getDatabases() {
     const res = await axios.get(`${BACKEND_URL}/api/v1/notion/databases`, {
@@ -34,43 +34,53 @@ export const Notion = ({
     });
     setDatabases([{ id: "", name: "Choose DB" }, ...res.data.databases]);
   }
-  async function checkIsConnected() {
-    const res = await axios.get(
-      `${BACKEND_URL}/api/v1/usercred/available?service=NOTION`,
-      {
-        headers: {
-          Authorization: localStorage.getItem("token"),
-        },
-      }
-    );
-    setIsConnected(res.data.isConnected);
-    if (res.data.isConnected) {
-      getDatabases();
-    }
-  }
-  async function getSchema() {
-    if (!selectedDatabase) return;
-    const res = await axios.get(
-      `${BACKEND_URL}/api/v1/notion/database/${selectedDatabase}`,
-      {
-        headers: {
-          Authorization: localStorage.getItem("token"),
-        },
-      }
-    );
-    setProperties(res.data.properties);
-  }
-
   useEffect(() => {
+    async function checkIsConnected() {
+      const res = await axios.get(
+        `${BACKEND_URL}/api/v1/usercred/available?service=NOTION`,
+        {
+          headers: {
+            Authorization: localStorage.getItem("token"),
+          },
+        }
+      );
+      setIsConnected(res.data.isConnected);
+      if (res.data.isConnected) {
+        getDatabases();
+      }
+    }
     checkIsConnected();
   }, []);
 
+  // async function getSchema() {
+  //   if (!selectedDatabase) return;
+  //   const res = await axios.get(
+  //     `${BACKEND_URL}/api/v1/notion/database/${selectedDatabase}`,
+  //     {
+  //       headers: {
+  //         Authorization: localStorage.getItem("token"),
+  //       },
+  //     }
+  //   );
+  //   setProperties(res.data.properties);
+  // }
+
   useEffect(() => {
+    async function getSchema() {
+      if (!selectedDatabase) return;
+      const res = await axios.get(
+        `${BACKEND_URL}/api/v1/notion/database/${selectedDatabase}`,
+        {
+          headers: {
+            Authorization: localStorage.getItem("token"),
+          },
+        }
+      );
+      setProperties(res.data.properties);
+    }
     getSchema();
   }, [selectedDatabase]);
 
-  const [email, setEmail] = useState("");
-  const [body, setBody] = useState("");
   return (
     <div className="flex flex-col gap-6">
       {selectedDatabase}
@@ -93,14 +103,38 @@ export const Notion = ({
             ))}
           </select>
 
-          {selectedDatabase && <div>
-            {JSON.stringify(properties)}
-            
-            {properties.map((prop,idx)=>{
-              
-            })}
+          {selectedDatabase && (
+            <div>
+              {JSON.stringify(values)}
 
-            </div>}
+              {properties.map((prop, idx) => (
+                <div
+                  key={idx}
+                  className="grid grid-cols-[1fr_1fr_1fr_4.5fr] items-center mb-4"
+                >
+                  <div className="font-semibold text-xl">{prop.name}</div>
+                  <div className="font-semibold text-base">{`(${prop.type})`}</div>
+                  <div className="font-semibold text-xl">:</div>
+                  <input
+                    className="border border-orange-400 p-2 text-lg"
+                    onChange={(e) =>
+                      setValues((xx) => ({
+                        ...xx,
+                        [prop.name]: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+              ))}
+              <PrimaryButton
+                onClick={() => {
+                  setMetadata(values);
+                }}
+              >
+                Submit
+              </PrimaryButton>
+            </div>
+          )}
         </div>
       ) : (
         <div>
