@@ -3,6 +3,7 @@ import { Input } from "../Input";
 import { PrimaryButton } from "../buttons/PrimaryButton";
 import axios from "axios";
 import { BACKEND_URL } from "@/app/config";
+import { Select } from "../Select";
 
 export const Notion = ({
   setMetadata,
@@ -11,25 +12,95 @@ export const Notion = ({
 }) => {
   const [isConnected, setIsConnected] = useState(false);
   const [apikey, setApikey] = useState("");
+  const [databases, setDatabases] = useState<
+    {
+      id: string;
+      name: string;
+    }[]
+  >([]);
+  const [selectedDatabase, setSelectedDatabase] = useState("");
+  const [properties, setProperties] = useState<
+    {
+      name: string;
+      type: string;
+    }[]
+  >([]);
 
-  useEffect(() => {
-    axios
-      .get(`${BACKEND_URL}/api/v1/usercred/available?service=NOTION`, {
+  async function getDatabases() {
+    const res = await axios.get(`${BACKEND_URL}/api/v1/notion/databases`, {
+      headers: {
+        Authorization: localStorage.getItem("token"),
+      },
+    });
+    setDatabases([{ id: "", name: "Choose DB" }, ...res.data.databases]);
+  }
+  async function checkIsConnected() {
+    const res = await axios.get(
+      `${BACKEND_URL}/api/v1/usercred/available?service=NOTION`,
+      {
         headers: {
           Authorization: localStorage.getItem("token"),
         },
-      })
-      .then((res) => res.data)
-      .then((data) => setIsConnected(data.isConnected));
+      }
+    );
+    setIsConnected(res.data.isConnected);
+    if (res.data.isConnected) {
+      getDatabases();
+    }
+  }
+  async function getSchema() {
+    if (!selectedDatabase) return;
+    const res = await axios.get(
+      `${BACKEND_URL}/api/v1/notion/database/${selectedDatabase}`,
+      {
+        headers: {
+          Authorization: localStorage.getItem("token"),
+        },
+      }
+    );
+    setProperties(res.data.properties);
+  }
+
+  useEffect(() => {
+    checkIsConnected();
   }, []);
+
+  useEffect(() => {
+    getSchema();
+  }, [selectedDatabase]);
 
   const [email, setEmail] = useState("");
   const [body, setBody] = useState("");
   return (
     <div className="flex flex-col gap-6">
+      {selectedDatabase}
       {isConnected ? (
-        <div>
+        <div className="flex flex-col gap-1">
+          <label className="font-medium text-gray-900">Choose Database</label>
+          <select
+            // value={value}
+            onChange={(e) => {
+              setSelectedDatabase(e.target.value);
+              console.log(e.target.value);
+            }}
+            value={selectedDatabase}
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+          >
+            {databases.map((db, idx) => (
+              <option key={idx} value={db.id} className="text-base">
+                {db.name}
+              </option>
+            ))}
+          </select>
+
+          {selectedDatabase && <div>
+            {JSON.stringify(properties)}
             
+            {properties.map((prop,idx)=>{
+              
+            })}
+
+            </div>}
         </div>
       ) : (
         <div>
@@ -53,6 +124,7 @@ export const Notion = ({
                 }
               );
               setIsConnected(true);
+              getDatabases();
             }}
           >
             Submit

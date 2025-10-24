@@ -7,7 +7,6 @@ import axios from "axios";
 export const notionRouter = express.Router();
 const NOTION_API_URL = "https://api.notion.com/v1";
 
-//creating a zap
 notionRouter.get("/databases", authMiddleware, async (req, res) => {
   try {
     //@ts-ignore
@@ -22,8 +21,6 @@ notionRouter.get("/databases", authMiddleware, async (req, res) => {
 
     const notionApiKey = credentials.apikey;
 
-    const notion = new Client({ auth: notionApiKey });
-
     //using the url version
     const response = await axios.post(
       `${NOTION_API_URL}/search`,
@@ -37,8 +34,8 @@ notionRouter.get("/databases", authMiddleware, async (req, res) => {
       }
     );
 
-    console.log(response.data);
-    console.log(response.data.results);
+    // console.log(response.data);
+
     const results: any[] = response.data.results; //pages/databases, everything here
 
     const databases = results
@@ -52,9 +49,52 @@ notionRouter.get("/databases", authMiddleware, async (req, res) => {
         };
       });
 
-    res.json(databases);
+    res.json({ databases });
   } catch (error) {
     console.log("ERROR", error);
+    return res.status(404).json({ error });
+  }
+});
+
+//getting schema for a databse
+notionRouter.get("/database/:dbid", authMiddleware, async (req, res) => {
+  try {
+    //@ts-ignore
+    const userId = req.id;
+    const { dbid } = req.params;
+    console.log(dbid);
+    const credentials = await prisma.userCredentials.findFirst({
+      where: { userId, service: "NOTION" },
+    });
+
+    if (!credentials) {
+      return res.status(401).json({ error: "Notion account not connected." });
+    }
+
+    const notionApiKey = credentials.apikey;
+
+    //using the url version
+    const response = await axios.get(`${NOTION_API_URL}/databases/${dbid}`, {
+      headers: {
+        Authorization: `Bearer ${notionApiKey}`,
+        "Notion-Version": "2022-06-28",
+      },
+    });
+
+    // console.log(response.data);
+
+    const props = response.data.properties; //This is the schema
+
+    const properties = Object.keys(props).map((key) => ({
+      name: key,
+      type: props[key].type,
+    }));
+
+    console.log(properties);
+
+    res.json({ properties });
+  } catch (error: any) {
+    console.log("ERROR", error.message);
     return res.status(404).json({ error });
   }
 });

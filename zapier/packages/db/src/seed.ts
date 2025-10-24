@@ -80,6 +80,15 @@ async function main() {
         "https://play-lh.googleusercontent.com/2BQu8Y7Ah9Gh9CZvmaMSYIcZvdO4KfdJ26EZ1WGyaOG_xxeDxNn-AZYxOtQJvyQQPFY",
     },
   });
+  
+  await prisma.availableAction.create({
+    data: {
+      id: "notion",
+      name: "Notion",
+      image:
+        "https://cdn.iconscout.com/icon/free/png-256/free-notion-logo-icon-svg-download-png-8630396.png",
+    },
+  });
 }
 
 main();
