@@ -14,6 +14,17 @@ async function main() {
   while (1) {
     const pendingRows = await prisma.zapRunOutbox.findMany({
       where: {},
+      include: {
+        zapRun: {
+          include: {
+            zap: {
+              select: {
+                userId: true,
+              },
+            },
+          },
+        },
+      },
       take: 10,
     });
 
@@ -21,7 +32,11 @@ async function main() {
     await producer.send({
       topic: TOPIC_NAME,
       messages: pendingRows.map((r) => ({
-        value: JSON.stringify({ zapRunId: r.zapRunId, stage: 0 }),
+        value: JSON.stringify({
+          userId: r.zapRun.zap.userId,
+          zapRunId: r.zapRunId,
+          stage: 0,
+        }),
       })),
     });
 

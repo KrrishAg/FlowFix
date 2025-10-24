@@ -24,7 +24,9 @@ export const Notion = ({
       type: string;
     }[]
   >([]);
-  const [values, setValues] = useState<Record<string, string>>({});
+  const [values, setValues] = useState<
+    Record<string, { type: string; value: string }>
+  >({});
 
   async function getDatabases() {
     const res = await axios.get(`${BACKEND_URL}/api/v1/notion/databases`, {
@@ -51,19 +53,6 @@ export const Notion = ({
     }
     checkIsConnected();
   }, []);
-
-  // async function getSchema() {
-  //   if (!selectedDatabase) return;
-  //   const res = await axios.get(
-  //     `${BACKEND_URL}/api/v1/notion/database/${selectedDatabase}`,
-  //     {
-  //       headers: {
-  //         Authorization: localStorage.getItem("token"),
-  //       },
-  //     }
-  //   );
-  //   setProperties(res.data.properties);
-  // }
 
   useEffect(() => {
     async function getSchema() {
@@ -120,7 +109,10 @@ export const Notion = ({
                     onChange={(e) =>
                       setValues((xx) => ({
                         ...xx,
-                        [prop.name]: e.target.value,
+                        [prop.name]: {
+                          type: prop.type,
+                          value: e.target.value,
+                        },
                       }))
                     }
                   />

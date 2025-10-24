@@ -9,6 +9,7 @@ import { sendAPIReq } from "./apireq.js";
 import { sendTelegramMessage } from "./telegram.js";
 import { sendDataToFilter } from "./filter.js";
 import { sendRazorpay } from "./razorpay.js";
+import { createNotion } from "./notion.js";
 
 //sent data this from postman, so this was stores aas zapRun's metadata
 // {
@@ -223,35 +224,20 @@ async function main() {
       if (currAction.actionTypeId === "razorpay") {
         console.log(`Stage ${stage} running: Creatiing a new razorpay link`);
 
-        console.log(actionMetadata);
-        console.log(zapRunDetails?.metadata);
+        // console.log(actionMetadata);
+        // console.log(zapRunDetails?.metadata);
 
         const keyId = parse(actionMetadata?.keyId, zapRunDetails?.metadata);
-        const keySecret = parse(
-          actionMetadata?.keySecret,
-          zapRunDetails?.metadata
-        );
-        const amntInPaise = parse(
-          actionMetadata?.amntInPaise,
-          zapRunDetails?.metadata
-        );
-        const description = parse(
-          actionMetadata?.description,
-          zapRunDetails?.metadata
-        );
-        const custName = parse(
-          actionMetadata?.custName,
-          zapRunDetails?.metadata
-        );
-        const custEmail = parse(
-          actionMetadata?.custEmail,
-          zapRunDetails?.metadata
-        );
+        const keySecret = parse(actionMetadata?.keySecret, combinedObject);
+        const amntInPaise = parse(actionMetadata?.amntInPaise, combinedObject);
+        const description = parse(actionMetadata?.description, combinedObject);
+        const custName = parse(actionMetadata?.custName, combinedObject);
+        const custEmail = parse(actionMetadata?.custEmail, combinedObject);
 
         console.log();
 
         console.log(`Sending the data to create razorpay link`);
-        //@ts-ignore
+
         const razorpayUrl = await sendRazorpay({
           keyId,
           keySecret,
@@ -261,7 +247,33 @@ async function main() {
           custEmail,
         });
         //@ts-ignore
-        extra["razorpayUrl"] = razorpayUrl;
+        extra["razorpayUrl"] = razorpayUrl; //adding that razorpay link url in the extra so that it gets added on message for next kafka message
+      }
+
+      if (currAction.actionTypeId === "notion") {
+        console.log(`Stage ${stage} running: Dealing with notion`);
+
+        console.log(actionMetadata);
+        console.log(combinedObject);
+
+        // const keyId = parse(actionMetadata?.keyId, zapRunDetails?.metadata);
+
+        const valsToSend: Record<string, any> = {};
+
+        if (actionMetadata) {
+          for (const [key, valueObj] of Object.entries(actionMetadata)) {
+            valsToSend[key] = {};
+            valsToSend[key].type = valueObj.type;
+            valsToSend[key].value = parse(valueObj.value, combinedObject);
+          }
+        }
+
+        console.log(valsToSend);
+
+        console.log(`Sending the data to create notion field`);
+
+        //@ts-ignore
+        createNotion(valsToSend, parsedData.userId);
       }
 
       await new Promise((resolve) => setTimeout(resolve, 500));
