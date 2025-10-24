@@ -1,5 +1,6 @@
 import prisma from "@repo/db/client";
 import axios from "axios";
+import cryptojs from "crypto-js";
 
 type notionDatatype = Record<string, { type: string; value: string }>;
 
@@ -13,6 +14,12 @@ export async function createNotion(
     // console.log("dbId", dbId);
     // console.log("userId", userId);
 
+    const encryption_key = process.env.ENCRYPTION_KEY;
+    //decrypting the notion api key from db
+    if (!encryption_key) {
+      throw new Error("No encryption key found in env while setting the api");
+    }
+
     const credentials = await prisma.userCredentials.findFirst({
       where: { userId, service: "NOTION" },
     });
@@ -21,7 +28,18 @@ export async function createNotion(
       throw new Error("Notion account not connected.");
     }
 
-    const notionApiKey = credentials.apikey;
+    const notionEncryptedApiKey = credentials.apikey;
+    console.log("notionEncryptedApiKey", notionEncryptedApiKey, encryption_key);
+    const bytes = cryptojs.AES.decrypt(notionEncryptedApiKey, encryption_key);
+    const notionDecryptedApiKey = bytes.toString(cryptojs.enc.Utf8);
+
+    console.log("notionDecryptedApiKey", notionDecryptedApiKey);
+
+    if (!notionDecryptedApiKey) {
+      console.log("Failed to decrypt credentials");
+      throw new Error("Failed to decrypt credentials");
+    }
+    //done with getting notion api key
 
     const properties = buildNotionProperties(data);
 
@@ -33,7 +51,7 @@ export async function createNotion(
       },
       {
         headers: {
-          Authorization: `Bearer ${notionApiKey}`,
+          Authorization: `Bearer ${notionDecryptedApiKey}`,
           "Content-Type": "application/json",
           "Notion-Version": "2022-06-28",
         },

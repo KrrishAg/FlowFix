@@ -72,7 +72,6 @@ export const Notion = ({
 
   return (
     <div className="flex flex-col gap-6">
-      {selectedDatabase}
       {isConnected ? (
         <div className="flex flex-col gap-1">
           <label className="font-medium text-gray-900">Choose Database</label>
@@ -83,7 +82,7 @@ export const Notion = ({
               console.log(e.target.value);
             }}
             value={selectedDatabase}
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mb-4"
           >
             {databases.map((db, idx) => (
               <option key={idx} value={db.id} className="text-base">

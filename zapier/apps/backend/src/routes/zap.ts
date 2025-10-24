@@ -1,5 +1,5 @@
 import express from "express";
-import { authMiddleware } from "../middleware.js";
+import { authMiddleware } from "../middlewares/authMiddleware.js";
 import { zapCreateSchema } from "../types/index.js";
 import prisma from "@repo/db/client";
 
@@ -215,4 +215,3 @@ zapRouter.delete("/:zapid", authMiddleware, async (req, res) => {
     return res.status(404).json({ error });
   }
 });
-

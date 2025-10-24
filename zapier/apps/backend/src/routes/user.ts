@@ -1,5 +1,5 @@
 import express from "express";
-import { authMiddleware } from "../middleware.js";
+import { authMiddleware } from "../middlewares/authMiddleware.js";
 import { signinSchema, signupSchema } from "../types/index.js";
 import prisma from "@repo/db/client";
 import jwt from "jsonwebtoken";
