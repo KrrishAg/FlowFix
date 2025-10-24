@@ -29,11 +29,10 @@ export async function createNotion(
     }
 
     const notionEncryptedApiKey = credentials.apikey;
-    console.log("notionEncryptedApiKey", notionEncryptedApiKey, encryption_key);
+
     const bytes = cryptojs.AES.decrypt(notionEncryptedApiKey, encryption_key);
     const notionDecryptedApiKey = bytes.toString(cryptojs.enc.Utf8);
 
-    console.log("notionDecryptedApiKey", notionDecryptedApiKey);
 
     if (!notionDecryptedApiKey) {
       console.log("Failed to decrypt credentials");
