@@ -4,6 +4,7 @@ import { signinSchema, signupSchema } from "../types/index.js";
 import prisma from "@repo/db/client";
 import jwt from "jsonwebtoken";
 import { jwtsecret } from "../config.js";
+import bcrypt from "bcrypt";
 
 export const userRouter = express.Router();
 
@@ -24,10 +25,13 @@ userRouter.post("/signup", async (req, res) => {
       return res.status(411).json({ error: "User exists" });
     }
 
+    const hashedPassword =
+      (await bcrypt.hash(parsedData.data.password, 10)) || "";
+
     await prisma.user.create({
       data: {
         email: parsedData.data.username,
-        password: parsedData.data.password,
+        password: hashedPassword,
         name: parsedData.data.name,
       },
     });
@@ -56,12 +60,15 @@ userRouter.post("/signin", async (req, res) => {
     const user = await prisma.user.findFirst({
       where: {
         email: parsedData.data.username,
-        password: parsedData.data.password,
       },
     });
     if (!user) {
       return res.status(411).json({ error: "User doesn't exist" });
     }
+
+    const equal = await bcrypt.compare(parsedData.data.password, user.password);
+
+    if (!equal) throw new Error("Passwords do not match/Wrong Credentials");
 
     if (!jwtsecret) {
       return res
@@ -98,4 +105,3 @@ userRouter.get("/", authMiddleware, async (req, res) => {
     return res.status(404).json({ error });
   }
 });
-
