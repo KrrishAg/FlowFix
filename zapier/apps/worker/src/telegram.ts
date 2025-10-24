@@ -20,7 +20,7 @@ export async function sendTelegramMessage(data: TelegramDatatype) {
       text: message,
     });
 
-    console.log("Telegram message sent:", res.data);
+    console.log("Telegram message sent successfully");
   } catch (error: any) {
     console.error("Telegram action failed:", error);
   }

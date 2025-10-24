@@ -94,8 +94,7 @@ export const Notion = ({
 
           {selectedDatabase && (
             <div>
-              {JSON.stringify(values)}
-
+              {/* {JSON.stringify(values)} */}
               {properties.map((prop, idx) => (
                 <div
                   key={idx}
@@ -120,7 +119,7 @@ export const Notion = ({
               ))}
               <PrimaryButton
                 onClick={() => {
-                  setMetadata(values);
+                  setMetadata({ ...values, dbId: selectedDatabase });
                 }}
               >
                 Submit
@@ -157,6 +156,10 @@ export const Notion = ({
           </PrimaryButton>
         </div>
       )}
+      <p className="text-center -mt-4 text-sm">
+        To use the link created by notion in further actions, use{" "}
+        {`--> {notionUrl}`}
+      </p>
     </div>
   );
 };

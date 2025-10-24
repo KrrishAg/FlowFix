@@ -1,18 +1,50 @@
+import prisma from "@repo/db/client";
 import axios from "axios";
 
 type notionDatatype = Record<string, { type: string; value: string }>;
-const BACKEND_URL = "http://localhost:3000";
 
-export async function createNotion(data: notionDatatype, userId: number) {
+export async function createNotion(
+  data: notionDatatype,
+  dbId: string,
+  userId: number
+) {
   try {
-    console.log("DATA", data);
-    console.log("userId", userId);
+    // console.log("DATA", data);
+    // console.log("dbId", dbId);
+    // console.log("userId", userId);
+
+    const credentials = await prisma.userCredentials.findFirst({
+      where: { userId, service: "NOTION" },
+    });
+
+    if (!credentials) {
+      throw new Error("Notion account not connected.");
+    }
+
+    const notionApiKey = credentials.apikey;
 
     const properties = buildNotionProperties(data);
 
-    // console.log(properties);
+    const response = await axios.post(
+      `https://api.notion.com/v1/pages`,
+      {
+        parent: { database_id: dbId },
+        properties: properties, // The dynamically built object
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${notionApiKey}`,
+          "Content-Type": "application/json",
+          "Notion-Version": "2022-06-28",
+        },
+      }
+    );
+    const pageUrl = response.data.url;
 
     console.log("Notion db updated successfully");
+
+    //returning the page url so that next action may use it
+    return pageUrl;
   } catch (error: any) {
     console.error("Failed to deal with notion:", error.message);
     return {

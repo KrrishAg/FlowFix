@@ -49,6 +49,7 @@ export async function sendAPIReq(apiData: ApiDatatype) {
     console.log("Status:", response.status);
     console.log("Data:", response.data);
 
+    console.log("API req sent successfully");
     return { success: true };
   } catch (error) {
     console.error("Hitting api endpoint sending error:", error);

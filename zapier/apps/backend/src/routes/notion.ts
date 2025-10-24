@@ -57,12 +57,12 @@ notionRouter.get("/databases", authMiddleware, async (req, res) => {
 });
 
 //getting schema for a databse
-notionRouter.get("/database/:dbid", authMiddleware, async (req, res) => {
+notionRouter.get("/database/:dbId", authMiddleware, async (req, res) => {
   try {
     //@ts-ignore
     const userId = req.id;
-    const { dbid } = req.params;
-    console.log(dbid);
+    const { dbId } = req.params;
+    // console.log(dbId);
     const credentials = await prisma.userCredentials.findFirst({
       where: { userId, service: "NOTION" },
     });
@@ -74,7 +74,7 @@ notionRouter.get("/database/:dbid", authMiddleware, async (req, res) => {
     const notionApiKey = credentials.apikey;
 
     //using the url version
-    const response = await axios.get(`${NOTION_API_URL}/databases/${dbid}`, {
+    const response = await axios.get(`${NOTION_API_URL}/databases/${dbId}`, {
       headers: {
         Authorization: `Bearer ${notionApiKey}`,
         "Notion-Version": "2022-06-28",

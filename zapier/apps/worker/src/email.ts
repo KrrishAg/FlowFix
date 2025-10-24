@@ -34,9 +34,10 @@ export async function sendEmail(emailData: EmailDatatype) {
     });
 
     if (error) {
+      console.log("Error in sending the mail");
       return { success: false, error };
     }
-
+    console.log("Mail sent successfully");
     return { success: true, data };
   } catch (error) {
     console.error("Email sending error:", error);

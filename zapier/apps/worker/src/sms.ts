@@ -17,7 +17,7 @@ export async function sendSms(smsData: SmsDatatype) {
       from: process.env.TWILIO_SENDER_NUMBER,
       to: process.env.TWILIO_RECEIVER_NUMBER || "",
     });
-    console.log(message.sid);
+    console.log("SMS sent successfully");
   } catch (error) {
     console.error("Failed to send the sms:", error);
     return {

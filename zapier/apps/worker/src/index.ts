@@ -220,7 +220,7 @@ async function main() {
         res = sendDataToFilter({ logic, condition1, condition2 });
       }
 
-      const extra = {};
+      const extra: Record<string, any> = {};
       if (currAction.actionTypeId === "razorpay") {
         console.log(`Stage ${stage} running: Creatiing a new razorpay link`);
 
@@ -246,7 +246,7 @@ async function main() {
           custName,
           custEmail,
         });
-        //@ts-ignore
+
         extra["razorpayUrl"] = razorpayUrl; //adding that razorpay link url in the extra so that it gets added on message for next kafka message
       }
 
@@ -262,6 +262,7 @@ async function main() {
 
         if (actionMetadata) {
           for (const [key, valueObj] of Object.entries(actionMetadata)) {
+            if (key === "dbId") continue;
             valsToSend[key] = {};
             valsToSend[key].type = valueObj.type;
             valsToSend[key].value = parse(valueObj.value, combinedObject);
@@ -272,8 +273,14 @@ async function main() {
 
         console.log(`Sending the data to create notion field`);
 
-        //@ts-ignore
-        createNotion(valsToSend, parsedData.userId);
+        const notionUrl = createNotion(
+          valsToSend,
+          //@ts-ignore
+          actionMetadata["dbId"],
+          combinedObject.userId
+        );
+
+        extra["notionUrl"] = await notionUrl;
       }
 
       await new Promise((resolve) => setTimeout(resolve, 500));
