@@ -1,28 +1,28 @@
 import express from "express";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
-import { zapCreateSchema } from "../types/index.js";
+import { flowCreateSchema } from "../types/index.js";
 import prisma from "@repo/db/client";
 
-export const zapRouter = express.Router();
+export const flowRouter = express.Router();
 
 //creating a zap
-zapRouter.post("/createZap", authMiddleware, async (req, res) => {
+flowRouter.post("/createFlow", authMiddleware, async (req, res) => {
   try {
     //@ts-ignore
     const userId: string = req.id;
     const body = req.body;
-    const parsedData = zapCreateSchema.safeParse(body);
+    const parsedData = flowCreateSchema.safeParse(body);
 
     if (!parsedData.success) {
       console.log(parsedData.error);
       return res
         .status(411)
-        .json({ error: "Wrong data format sent for creating a zap" });
+        .json({ error: "Wrong data format sent for creating a flow" });
     }
 
-    const zapId = await prisma.$transaction(async (tx) => {
-      //creating a zap, but will need trigger id as well
-      const zap = await tx.zap.create({
+    const flowId = await prisma.$transaction(async (tx) => {
+      //creating a flow, but will need trigger id as well
+      const flow = await tx.flow.create({
         data: {
           userId: parseInt(userId),
           triggerId: "",
@@ -37,86 +37,86 @@ zapRouter.post("/createZap", authMiddleware, async (req, res) => {
         },
       });
 
-      //creating a trigger using the created zap
+      //creating a trigger using the created flow
       const trigger = await tx.trigger.create({
         data: {
-          zapId: zap.id,
+          flowId: flow.id,
           triggerTypeId: parsedData.data.availableTriggerId,
         },
       });
 
-      //updating the zap with the new trigger id
-      await tx.zap.update({
+      //updating the flow with the new trigger id
+      await tx.flow.update({
         where: {
-          id: zap.id,
+          id: flow.id,
         },
         data: {
           triggerId: trigger.id,
         },
       });
 
-      return zap.id;
+      return flow.id;
     });
 
-    res.json({ zapId });
+    res.json({ flowId });
   } catch (error) {
     console.log("ERROR", error);
     return res.status(404).json({ error });
   }
 });
 
-//editing a zap
-zapRouter.post("/editZap/:zapId", authMiddleware, async (req, res) => {
+//editing a flow
+flowRouter.post("/editFlow/:flowId", authMiddleware, async (req, res) => {
   try {
     //@ts-ignore
     const userId: string = req.id;
     const body = req.body;
-    const parsedData = zapCreateSchema.safeParse(body);
-    const zapId: string = req.params.zapId || "";
+    const parsedData = flowCreateSchema.safeParse(body);
+    const flowId: string = req.params.flowId || "";
 
-    if (!zapId) return res.status(411).json({ error: "No zap id found" });
+    if (!flowId) return res.status(411).json({ error: "No flow id found" });
 
     if (!parsedData.success) {
       console.log(parsedData.error);
       return res
         .status(411)
-        .json({ error: "Wrong data format sent for editing a zap" });
+        .json({ error: "Wrong data format sent for editing a flow" });
     }
 
     await prisma.$transaction(async (tx) => {
       //updating available trigger type id
       await tx.trigger.update({
         where: {
-          zapId: zapId,
+          flowId: flowId,
         },
         data: {
           triggerTypeId: parsedData.data.availableTriggerId,
         },
       });
 
-      //updating zap date
-      await tx.zap.update({
+      //updating flow date
+      await tx.flow.update({
         where: {
-          id: zapId,
+          id: flowId,
         },
         data: {
           date: new Date(),
         },
       });
 
-      //deleting old actions associated with this zap
+      //deleting old actions associated with this flow
       await tx.action.deleteMany({
         where: {
-          zapId: zapId,
+          flowId: flowId,
         },
       });
 
-      //creating new actiosns associated with this zap
+      //creating new actiosns associated with this flow
       await Promise.all(
         parsedData.data.actions.map(async (act, idx) => {
           return await tx.action.create({
             data: {
-              zapId: zapId,
+              flowId: flowId,
               actionTypeId: act.availableActionId,
               metadata: act.actionMetaData,
               sortOrder: idx,
@@ -126,20 +126,20 @@ zapRouter.post("/editZap/:zapId", authMiddleware, async (req, res) => {
       );
     });
 
-    res.json({ zapId });
+    res.json({ flowId });
   } catch (error) {
     console.log("ERROR", error);
     return res.status(404).json({ error });
   }
 });
 
-//getting all the zaps for the logged in user
-zapRouter.get("/", authMiddleware, async (req, res) => {
+//getting all the flows for the logged in user
+flowRouter.get("/", authMiddleware, async (req, res) => {
   try {
     //need to include everything, as showing on FE
     //@ts-ignore
     const userId: string = req.id;
-    const zaps = await prisma.zap.findMany({
+    const flows = await prisma.flow.findMany({
       where: {
         userId: parseInt(userId),
       },
@@ -157,23 +157,23 @@ zapRouter.get("/", authMiddleware, async (req, res) => {
       },
     });
 
-    return res.json({ zaps });
+    return res.json({ flows });
   } catch (error) {
     console.log("ERROR", error);
     return res.status(404).json({ error });
   }
 });
 
-zapRouter.get("/:zapid", authMiddleware, async (req, res) => {
+flowRouter.get("/:flowId", authMiddleware, async (req, res) => {
   try {
-    const zapid = req.params.zapid;
+    const flowId = req.params.flowId;
     //need to include everything, as showing on FE
     //@ts-ignore
     const userId: string = req.id;
-    const zap = await prisma.zap.findFirst({
+    const flow = await prisma.flow.findFirst({
       where: {
         userId: parseInt(userId),
-        id: zapid,
+        id: flowId,
       },
       include: {
         actions: {
@@ -189,27 +189,27 @@ zapRouter.get("/:zapid", authMiddleware, async (req, res) => {
       },
     });
 
-    return res.json({ zap });
+    return res.json({ flow });
   } catch (error) {
     console.log("ERROR", error);
     return res.status(404).json({ error });
   }
 });
 
-zapRouter.delete("/:zapid", authMiddleware, async (req, res) => {
+flowRouter.delete("/:flowId", authMiddleware, async (req, res) => {
   try {
-    const zapid = req.params.zapid;
+    const flowId = req.params.flowId;
     //need to include everything, as showing on FE
     //@ts-ignore
     const userId: string = req.id;
-    await prisma.zap.delete({
+    await prisma.flow.delete({
       where: {
-        id: zapid,
+        id: flowId,
         userId: +userId,
       },
     });
 
-    return res.json({ success: true, message: "Deleted zap successfully" });
+    return res.json({ success: true, message: "Deleted flow successfully" });
   } catch (error) {
     console.log("ERROR", error);
     return res.status(404).json({ error });

@@ -11,7 +11,7 @@ export const signinSchema = z.object({
   password: z.string(),
 });
 
-export const zapCreateSchema = z.object({
+export const flowCreateSchema = z.object({
   availableTriggerId: z.string(),
   triggerMetaData: z.any().optional(),
   actions: z.array(

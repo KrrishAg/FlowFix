@@ -71,7 +71,7 @@ services:
 
       echo -e 'Creating kafka topics'
       # --- FIX: Connect to the INTERNAL listener port ---
-      kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists --topic zap_events --replication-factor 1 --partitions 1
+      kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists --topic flow_events --replication-factor 1 --partitions 1
 
       echo -e 'Successfully created the following topics:'
       # --- FIX: Connect to the INTERNAL listener port ---

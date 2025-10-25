@@ -2,7 +2,7 @@
 
 import useAuthRedirect, { BACKEND_URL } from "@/app/config";
 import Modal from "@/components/Modal";
-import { ZapCell } from "@/components/ZapCell";
+import { FlowCell } from "@/components/FlowCell";
 import { PrimaryButton } from "@/components/buttons/PrimaryButton";
 import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 //the type of data returned by the backend, got from postman
 interface Action {
   id: string;
-  zapId: string;
+  flowId: string;
   actionId: string;
   sortOrder: number;
   metadata: JSON;
@@ -49,7 +49,7 @@ function useAvailableActionsAndTriggers() {
 export default function Page() {
   useAuthRedirect();
 
-  const { zapid } = useParams();
+  const { flowid } = useParams();
   const router = useRouter();
 
   //get avl actions and triggers from backend
@@ -74,20 +74,20 @@ export default function Page() {
     }[]
   >([]);
 
-  //to see which zapbox has been selected
+  //to see which flowbox has been selected
   const [modelIndex, setModelIndex] = useState<null | number>(null);
 
   useEffect(() => {
     axios
-      .get(`${BACKEND_URL}/api/v1/zap/${zapid}`, {
+      .get(`${BACKEND_URL}/api/v1/flow/${flowid}`, {
         headers: { Authorization: localStorage.getItem("token") },
       })
       .then((res) => res.data)
       .then((res) => {
-        console.log(res.zap);
-        setSelectedTrigger(res.zap.trigger.AvailableTrigger);
+        console.log(res.flow);
+        setSelectedTrigger(res.flow.trigger.AvailableTrigger);
         setSelectedActions(
-          res.zap.actions.map((act: Action, idx: number) => ({
+          res.flow.actions.map((act: Action, idx: number) => ({
             idx: idx + 2,
             availableActionId: act.AvailableAction.id,
             availableActionName: act.AvailableAction.name,
@@ -96,7 +96,7 @@ export default function Page() {
           }))
         );
       });
-  }, [zapid]);
+  }, [flowid]);
 
   function addAction() {
     setSelectedActions((a) => [
@@ -161,49 +161,48 @@ export default function Page() {
   return (
     <div>
       {/* <Appbar /> */}
-      <div className="flex justify-end">
-        <PrimaryButton
-          onClick={async () => {
-            //returning if no trigger selected
-            if (!selectedTrigger?.id) {
-              alert("Kindly select a trigger");
-              return;
-            }
-            const find = selectedActions.find(
-              (action) => !action.availableActionId
-            );
+      <button
+        className="px-8 py-2 cursor-pointer hover:shadow-md bg-purple-700 text-white rounded-full text-center flex justify-center flex-col absolute right-2 top-20"
+        onClick={async () => {
+          //returning if no trigger selected
+          if (!selectedTrigger?.id) {
+            alert("Kindly select a trigger");
+            return;
+          }
+          const find = selectedActions.find(
+            (action) => !action.availableActionId
+          );
 
-            //returning if no action selected or some action not chosen
-            if (find || selectedActions.length === 0) {
-              alert("Kindly choose the actions");
-              return;
-            }
+          //returning if no action selected or some action not chosen
+          if (find || selectedActions.length === 0) {
+            alert("Kindly choose the actions");
+            return;
+          }
 
-            await axios.post(
-              `${BACKEND_URL}/api/v1/zap/editZap/` + zapid,
-              {
-                availableTriggerId: selectedTrigger?.id,
-                triggerMetaData: {},
-                actions: selectedActions.map((action) => ({
-                  availableActionId: action.availableActionId,
-                  actionMetaData: action.metadata,
-                })),
+          await axios.post(
+            `${BACKEND_URL}/api/v1/flow/createFlow`,
+            {
+              availableTriggerId: selectedTrigger?.id,
+              triggerMetaData: {},
+              actions: selectedActions.map((action) => ({
+                availableActionId: action.availableActionId,
+                actionMetaData: action.metadata,
+              })),
+            },
+            {
+              headers: {
+                Authorization: localStorage.getItem("token"),
               },
-              {
-                headers: {
-                  Authorization: localStorage.getItem("token"),
-                },
-              }
-            );
-            router.push("/dashboard");
-          }}
-        >
-          Publish
-        </PrimaryButton>
-      </div>
+            }
+          );
+          router.push("/dashboard");
+        }}
+      >
+        Publish
+      </button>
       <div className="w-full min-h-screen bg-slate-200 flex flex-col justify-center">
         <div className="flex justify-center w-full">
-          <ZapCell
+          <FlowCell
             onClick={() => {
               setModelIndex(1);
             }}
@@ -215,7 +214,7 @@ export default function Page() {
         <div className="w-full pt-2 pb-2">
           {selectedActions.map((action, index) => (
             <div key={index} className="pt-2 flex justify-center">
-              <ZapCell
+              <FlowCell
                 onClick={() => {
                   setModelIndex(action.idx);
                 }}

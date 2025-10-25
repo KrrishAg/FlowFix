@@ -1,5 +1,5 @@
 {
-  "name": "zapier",
+  "name": "flowfix",
   "private": true,
   "scripts": {
     "build": "turbo run build",

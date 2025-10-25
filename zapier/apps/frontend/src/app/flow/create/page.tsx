@@ -2,7 +2,7 @@
 
 import useAuthRedirect, { BACKEND_URL } from "@/app/config";
 import Modal from "@/components/Modal";
-import { ZapCell } from "@/components/ZapCell";
+import { FlowCell } from "@/components/FlowCell";
 import { PrimaryButton } from "@/components/buttons/PrimaryButton";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -58,7 +58,7 @@ export default function Page() {
     }[]
   >([]);
 
-  //to see which zapbox has been selected
+  //to see which flowbox has been selected
   const [modelIndex, setModelIndex] = useState<null | number>(null);
 
   function addAction() {
@@ -123,50 +123,48 @@ export default function Page() {
 
   return (
     <div>
-      {/* <Appbar /> */}
-      <div className="flex justify-end">
-        <PrimaryButton
-          onClick={async () => {
-            //returning if no trigger selected
-            if (!selectedTrigger?.id) {
-              alert("Kindly select a trigger");
-              return;
-            }
-            const find = selectedActions.find(
-              (action) => !action.availableActionId
-            );
+      <button
+        className="px-8 py-2 cursor-pointer hover:shadow-md bg-purple-700 text-white rounded-full text-center flex justify-center flex-col absolute right-2 top-20"
+        onClick={async () => {
+          //returning if no trigger selected
+          if (!selectedTrigger?.id) {
+            alert("Kindly select a trigger");
+            return;
+          }
+          const find = selectedActions.find(
+            (action) => !action.availableActionId
+          );
 
-            //returning if no action selected or some action not chosen
-            if (find || selectedActions.length === 0) {
-              alert("Kindly choose the actions");
-              return;
-            }
+          //returning if no action selected or some action not chosen
+          if (find || selectedActions.length === 0) {
+            alert("Kindly choose the actions");
+            return;
+          }
 
-            await axios.post(
-              `${BACKEND_URL}/api/v1/zap/createZap`,
-              {
-                availableTriggerId: selectedTrigger?.id,
-                triggerMetaData: {},
-                actions: selectedActions.map((action) => ({
-                  availableActionId: action.availableActionId,
-                  actionMetaData: action.metadata,
-                })),
+          await axios.post(
+            `${BACKEND_URL}/api/v1/flow/createFlow`,
+            {
+              availableTriggerId: selectedTrigger?.id,
+              triggerMetaData: {},
+              actions: selectedActions.map((action) => ({
+                availableActionId: action.availableActionId,
+                actionMetaData: action.metadata,
+              })),
+            },
+            {
+              headers: {
+                Authorization: localStorage.getItem("token"),
               },
-              {
-                headers: {
-                  Authorization: localStorage.getItem("token"),
-                },
-              }
-            );
-            router.push("/dashboard");
-          }}
-        >
-          Publish
-        </PrimaryButton>
-      </div>
+            }
+          );
+          router.push("/dashboard");
+        }}
+      >
+        Publish
+      </button>
       <div className="w-full min-h-screen bg-slate-200 flex flex-col justify-center">
         <div className="flex justify-center w-full">
-          <ZapCell
+          <FlowCell
             onClick={() => {
               setModelIndex(1);
             }}
@@ -178,7 +176,7 @@ export default function Page() {
         <div className="w-full pt-2 pb-2">
           {selectedActions.map((action, index) => (
             <div key={index} className="pt-2 flex justify-center">
-              <ZapCell
+              <FlowCell
                 onClick={() => {
                   setModelIndex(action.idx);
                 }}

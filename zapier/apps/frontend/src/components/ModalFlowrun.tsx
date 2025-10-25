@@ -7,11 +7,11 @@ import { jwtDecode } from "jwt-decode";
 import { PrimaryButton } from "./buttons/PrimaryButton";
 import { EnhancedTextarea } from "./TextArea";
 
-export default function ModalZaprun({
-  zapId,
+export default function ModalFlowrun({
+  flowId,
   onSelect,
 }: {
-  zapId: string;
+  flowId: string;
   onSelect: () => void;
 }) {
   //when action clicked, it stores these three fields which will later be used to call the onSelect function
@@ -69,7 +69,7 @@ export default function ModalZaprun({
                   console.log(text);
                   axios.post(
                     //@ts-expect-error: huh
-                    `${HOOKS_URL}/hooks/catch/${jwtDecode(localStorage.getItem("token") as string).id}/${zapId}`,
+                    `${HOOKS_URL}/hooks/catch/${jwtDecode(localStorage.getItem("token") as string).id}/${flowId}`,
                     JSON.parse(text),
                     {
                       headers: { Authorization: localStorage.getItem("token") },

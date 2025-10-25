@@ -7,17 +7,17 @@ import { LinkButton } from "@/components/buttons/LinkButton";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { jwtDecode } from "jwt-decode";
-import ModalZaprun from "@/components/ModalZaprun";
+import ModalFlowrun from "@/components/ModalFlowrun";
 
 //the type of data returned by the backend, got from postman
-interface Zap {
+interface Flow {
   id: string;
   triggerId: string;
   userId: number;
   date: Date;
   actions: {
     id: string;
-    zapId: string;
+    flowId: string;
     actionId: string;
     sortingOrder: number;
     AvailableAction: {
@@ -28,7 +28,7 @@ interface Zap {
   }[];
   trigger: {
     id: string;
-    zapId: string;
+    flowId: string;
     triggerId: string;
     AvailableTrigger: {
       id: string;
@@ -38,20 +38,20 @@ interface Zap {
   };
 }
 
-function useZaps() {
+function useFlows() {
   const [loading, setLoading] = useState(true);
-  const [zaps, setZaps] = useState<Zap[]>([]);
+  const [flows, setFlows] = useState<Flow[]>([]);
   const [error, setError] = useState("");
 
   useEffect(() => {
     axios
-      .get(`${BACKEND_URL}/api/v1/zap`, {
+      .get(`${BACKEND_URL}/api/v1/flow`, {
         headers: {
           Authorization: localStorage.getItem("token"),
         },
       })
       .then((res) => {
-        setZaps(res.data.zaps);
+        setFlows(res.data.flows);
       })
       .catch((err) => {
         // console.log("ERROR", err);
@@ -62,35 +62,35 @@ function useZaps() {
 
   return {
     loading,
-    zaps,
-    setZaps,
+    flows,
+    setFlows,
     error,
   };
 }
 
 export default function Page() {
   useAuthRedirect();
-  const { loading, zaps, setZaps, error } = useZaps();
+  const { loading, flows, setFlows, error } = useFlows();
   const router = useRouter();
-  const [selectedZapId, setSelectedZapId] = useState<string | null>(null);
+  const [selectedFlowId, setSelectedFlowId] = useState<string | null>(null);
 
   function changeModalLayout() {
     // if (text === null) {
     // } else {
     // }
-    setSelectedZapId(null);
+    setSelectedFlowId(null);
   }
 
   return (
     <div>
       {/* <Appbar /> */}
       <div className="flex justify-center pt-8">
-        <div className="max-w-screen-lg	 w-full">
-          <div className="flex justify-between pr-8 ">
-            <div className="text-2xl font-bold">My Zaps</div>
+        <div className="w-full">
+          <div className="flex justify-between px-30">
+            <div className="text-3xl font-bold">My Flows</div>
             <DarkButton
               onClick={() => {
-                router.push("/zap/create");
+                router.push("/flow/create");
               }}
             >
               Create
@@ -109,13 +109,16 @@ export default function Page() {
         </div>
       ) : (
         <div className="flex justify-center">
-          <ZapTable
-            zaps={zaps}
-            setZaps={setZaps}
-            setSelectedZapId={setSelectedZapId}
+          <FlowTable
+            flows={flows}
+            setFlows={setFlows}
+            setSelectedFlowId={setSelectedFlowId}
           />
-          {selectedZapId && (
-            <ModalZaprun zapId={selectedZapId} onSelect={changeModalLayout} />
+          {selectedFlowId && (
+            <ModalFlowrun
+              flowId={selectedFlowId}
+              onSelect={changeModalLayout}
+            />
           )}
         </div>
       )}
@@ -123,21 +126,21 @@ export default function Page() {
   );
 }
 
-function ZapTable({
-  zaps,
-  setZaps,
-  setSelectedZapId,
+function FlowTable({
+  flows,
+  setFlows,
+  setSelectedFlowId,
 }: {
-  zaps: Zap[];
-  setZaps: Dispatch<SetStateAction<Zap[]>>;
-  setSelectedZapId: Dispatch<SetStateAction<string | null>>;
+  flows: Flow[];
+  setFlows: Dispatch<SetStateAction<Flow[]>>;
+  setSelectedFlowId: Dispatch<SetStateAction<string | null>>;
 }) {
   useAuthRedirect();
   const router = useRouter();
 
   return (
     <div className="px-30">
-      <div className="mt-10 grid grid-cols-[3fr_3fr_3fr_9fr_2fr_2fr_2fr] justify-items-center border p-3">
+      <div className="mt-10 grid grid-cols-[3fr_3fr_3fr_9fr_2fr_2fr_2fr] justify-items-center border border-blue-400 p-3 font-bold text-lg">
         <div className="col-span-1">Name</div>
         <div className="col-span-1">ID</div>
         <div className="col-span-1">Created at</div>
@@ -146,10 +149,10 @@ function ZapTable({
         <div className="col-span-1">Delete</div>
         <div className="col-span-1">Go</div>
       </div>
-      {zaps.map((z) => (
+      {flows.map((z) => (
         <div
           key={z.id}
-          className="grid grid-cols-[3fr_3fr_3fr_9fr_2fr_2fr_2fr] justify-items-center border p-3"
+          className="grid grid-cols-[3fr_3fr_3fr_9fr_2fr_2fr_2fr] justify-items-center border border-t-0 border-blue-400 p-3"
         >
           <div className="flex-1 flex">
             <Image
@@ -177,7 +180,7 @@ function ZapTable({
           <div className="flex-1">
             <LinkButton
               onClick={async () => {
-                router.push(`/zap/edit/` + z.id);
+                router.push(`/flow/edit/` + z.id);
               }}
             >
               Edit
@@ -186,10 +189,10 @@ function ZapTable({
           <div className="flex-1">
             <LinkButton
               onClick={async () => {
-                await axios.delete(`${BACKEND_URL}/api/v1/zap/` + z.id, {
+                await axios.delete(`${BACKEND_URL}/api/v1/flow/` + z.id, {
                   headers: { Authorization: localStorage.getItem("token") },
                 });
-                setZaps((s) => s.filter((zap) => zap.id !== z.id));
+                setFlows((s) => s.filter((flow) => flow.id !== z.id));
               }}
             >
               Delete
@@ -198,7 +201,7 @@ function ZapTable({
           <div className="flex-1">
             <LinkButton
               onClick={() => {
-                setSelectedZapId(z.id);
+                setSelectedFlowId(z.id);
               }}
             >
               Go

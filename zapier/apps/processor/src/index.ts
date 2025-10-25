@@ -18,12 +18,12 @@ async function main() {
   await producer.connect();
 
   while (1) {
-    const pendingRows = await prisma.zapRunOutbox.findMany({
+    const pendingRows = await prisma.flowRunOutbox.findMany({
       where: {},
       include: {
-        zapRun: {
+        flowRun: {
           include: {
-            zap: {
+            flow: {
               select: {
                 userId: true,
               },
@@ -39,15 +39,15 @@ async function main() {
       topic: TOPIC_NAME,
       messages: pendingRows.map((r) => ({
         value: JSON.stringify({
-          userId: r.zapRun.zap.userId,
-          zapRunId: r.zapRunId,
+          userId: r.flowRun.flow.userId,
+          flowRunId: r.flowRunId,
           stage: 0,
         }),
       })),
     });
 
-    //after putting them in kafka, deleting from the zaprunoutbox table
-    await prisma.zapRunOutbox.deleteMany({
+    //after putting them in kafka, deleting from the flowrunoutbox table
+    await prisma.flowRunOutbox.deleteMany({
       where: {
         id: {
           in: pendingRows.map((r) => r.id),

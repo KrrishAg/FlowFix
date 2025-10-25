@@ -7,24 +7,24 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-app.post("/hooks/catch/:userId/:zapId", async (req, res) => {
+app.post("/hooks/catch/:userId/:flowId", async (req, res) => {
   const userId = req.params.userId;
-  const zapId = req.params.zapId;
+  const flowId = req.params.flowId;
   const body = req.body;
 
   await prisma.$transaction(async (tx) => {
     //storing in db
-    const run = await tx.zapRun.create({
+    const run = await tx.flowRun.create({
       data: {
-        zapId,
+        flowId,
         metadata: body, //this would be data sent in body in json format
       },
     });
 
     //storing in the outbox as well
-    await tx.zapRunOutbox.create({
+    await tx.flowRunOutbox.create({
       data: {
-        zapRunId: run.id,
+        flowRunId: run.id,
       },
     });
 

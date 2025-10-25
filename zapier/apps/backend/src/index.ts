@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { userRouter } from "./routes/user.js";
-import { zapRouter } from "./routes/zap.js";
+import { flowRouter } from "./routes/flow.js";
 import { triggerRouter } from "./routes/trigger.js";
 import { actionRouter } from "./routes/action.js";
 import { userCredRouter } from "./routes/userCred.js";
@@ -13,7 +13,7 @@ app.use(cors());
 
 app.use("/api/v1/user", userRouter);
 
-app.use("/api/v1/zap", zapRouter);
+app.use("/api/v1/flow", flowRouter);
 
 app.use("/api/v1/trigger", triggerRouter);
 

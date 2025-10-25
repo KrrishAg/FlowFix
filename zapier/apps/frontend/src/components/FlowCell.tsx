@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-export const ZapCell = ({
+export const FlowCell = ({
   name,
   index,
   onClick,
@@ -17,7 +17,7 @@ export const ZapCell = ({
     <div className={`flex gap-3 items-center ${removeAction ? "pl-13" : ""}`}>
       <div
         onClick={onClick}
-        className="border border-black py-8 px-8 flex w-[300px] cursor-pointer"
+        className="border border-blue-400 py-8 px-8 flex w-[300px] cursor-pointer rounded-lg"
       >
         <div className="flex text-xl gap-2 items-center">
           <div className="font-bold">{index}.</div>

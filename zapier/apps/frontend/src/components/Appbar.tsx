@@ -47,7 +47,7 @@ export const Appbar = () => {
   return (
     <div className="flex border-b justify-between p-4">
       <div className="flex flex-col justify-center text-2xl font-extrabold">
-        Zapier
+        FlowFix
       </div>
       {token ? (
         <div className="flex gap-6 items-center">

@@ -8,41 +8,41 @@ datasource db {
 }
 
 model User {
-  id                Int               @id @default(autoincrement())
-  name              String
-  password          String
-  email             String
-  zaps              Zap[]
-  userCredentials   UserCredentials[]
+  id              Int               @id @default(autoincrement())
+  name            String
+  password        String
+  email           String
+  flows           Flow[]
+  userCredentials UserCredentials[]
 }
 
-model Zap {
-  id        String   @id @default(uuid())
+model Flow {
+  id        String    @id @default(uuid())
   userId    Int
-  triggerId String   @unique
+  triggerId String    @unique
   date      DateTime
   actions   Action[]
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  flowRuns  FlowRun[]
   trigger   Trigger?
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  zapRuns   ZapRun[]
 }
 
 model Trigger {
   id               String           @id @default(uuid())
-  zapId            String           @unique
   triggerTypeId    String
+  flowId           String           @unique
+  flow             Flow             @relation(fields: [flowId], references: [id], onDelete: Cascade)
   AvailableTrigger AvailableTrigger @relation(fields: [triggerTypeId], references: [id])
-  zap              Zap              @relation(fields: [zapId], references: [id], onDelete: Cascade)
 }
 
 model Action {
   id              String          @id @default(uuid())
-  zapId           String
   actionTypeId    String
   sortOrder       Int             @default(0)
   metadata        Json            @default("{}")
+  flowId          String
   AvailableAction AvailableAction @relation(fields: [actionTypeId], references: [id])
-  zap             Zap             @relation(fields: [zapId], references: [id], onDelete: Cascade)
+  flow            Flow            @relation(fields: [flowId], references: [id], onDelete: Cascade)
 }
 
 model AvailableTrigger {
@@ -59,25 +59,24 @@ model AvailableAction {
   Action Action[]
 }
 
-model ZapRun {
-  id           String        @id @default(uuid())
-  zapId        String
-  metadata     Json
-  zap          Zap           @relation(fields: [zapId], references: [id], onDelete: Cascade)
-  zapRunOutBox ZapRunOutbox?
+model FlowRun {
+  id            String         @id @default(uuid())
+  flowId        String
+  metadata      Json
+  flow          Flow           @relation(fields: [flowId], references: [id], onDelete: Cascade)
+  flowRunOutBox FlowRunOutbox?
 }
 
-model ZapRunOutbox {
-  id       String @id @default(uuid())
-  zapRunId String @unique
-  zapRun   ZapRun @relation(fields: [zapRunId], references: [id])
+model FlowRunOutbox {
+  id        String  @id @default(uuid())
+  flowRunId String  @unique
+  flowRun   FlowRun @relation(fields: [flowRunId], references: [id])
 }
-
 
 model UserCredentials {
-  id            String @id @default(uuid())
-  userId        Int
-  User User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  service       String
-  apikey        String
+  id      String @id @default(uuid())
+  userId  Int
+  service String
+  apikey  String
+  User    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

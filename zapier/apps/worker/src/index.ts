@@ -14,7 +14,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-//sent data this from postman, so this was stores aas zapRun's metadata
+//sent data this from postman, so this was stores aas flowRun's metadata
 // {
 //     "comment": {
 //         "email": "Krrish@temp.com",
@@ -56,15 +56,15 @@ async function main() {
 
       const parsedData = JSON.parse(message.value?.toString());
       console.log("PARSED DATA", parsedData);
-      const zapRunId = parsedData.zapRunId;
+      const flowRunId = parsedData.flowRunId;
       const stage = parsedData.stage; //this stage tells which action is/should currently be run
 
-      const zapRunDetails = await prisma.zapRun.findFirst({
+      const flowRunDetails = await prisma.flowRun.findFirst({
         where: {
-          id: zapRunId,
+          id: flowRunId,
         },
         include: {
-          zap: {
+          flow: {
             include: {
               actions: true,
             },
@@ -72,8 +72,8 @@ async function main() {
         },
       });
 
-      //trying to grab WHICH zap's WHICH action is currently being executed
-      const currAction = zapRunDetails?.zap.actions.find(
+      //trying to grab WHICH flow's WHICH action is currently being executed
+      const currAction = flowRunDetails?.flow.actions.find(
         (act) => act.sortOrder === stage
       );
       if (!currAction) {
@@ -81,16 +81,16 @@ async function main() {
         return;
       }
 
-      //TILL NOW zapRunDetails?.metadata for the values in the parse function was fine but WITH INTRO of Razorpay, I need link as well which is there in parsedObject, as I put it there while producing the next stage
+      //TILL NOW flowRunDetails?.metadata for the values in the parse function was fine but WITH INTRO of Razorpay, I need link as well which is there in parsedObject, as I put it there while producing the next stage
       let metadataObject = {};
 
       // This 'if' block safely checks if Metadata is *actually* an object
       if (
-        zapRunDetails?.metadata &&
-        typeof zapRunDetails.metadata === "object"
+        flowRunDetails?.metadata &&
+        typeof flowRunDetails.metadata === "object"
       ) {
         // If it's a real object, assign it
-        metadataObject = zapRunDetails.metadata;
+        metadataObject = flowRunDetails.metadata;
       }
 
       // 4. Now, you can safely combine them!
@@ -231,9 +231,9 @@ async function main() {
         console.log(`Stage ${stage} running: Creatiing a new razorpay link`);
 
         // console.log(actionMetadata);
-        // console.log(zapRunDetails?.metadata);
+        // console.log(flowRunDetails?.metadata);
 
-        const keyId = parse(actionMetadata?.keyId, zapRunDetails?.metadata);
+        const keyId = parse(actionMetadata?.keyId, flowRunDetails?.metadata);
         const keySecret = parse(actionMetadata?.keySecret, combinedObject);
         const amntInPaise = parse(actionMetadata?.amntInPaise, combinedObject);
         const description = parse(actionMetadata?.description, combinedObject);
@@ -262,7 +262,7 @@ async function main() {
         console.log(actionMetadata);
         console.log(combinedObject);
 
-        // const keyId = parse(actionMetadata?.keyId, zapRunDetails?.metadata);
+        // const keyId = parse(actionMetadata?.keyId, flowRunDetails?.metadata);
 
         const valsToSend: Record<string, any> = {};
 
@@ -293,7 +293,7 @@ async function main() {
 
       console.log("PROCESS DONE");
 
-      const lastStage = (zapRunDetails?.zap.actions.length || 1) - 1; //figuring out the last sortorder which tells if there is any further action for that zap
+      const lastStage = (flowRunDetails?.flow.actions.length || 1) - 1; //figuring out the last sortorder which tells if there is any further action for that flow
 
       if (stage !== lastStage && res) {
         await producer.send({
@@ -303,14 +303,14 @@ async function main() {
               value: JSON.stringify({
                 ...parsedData,
                 ...extra,
-                zapRunId,
+                flowRunId,
                 stage: stage + 1,
               }),
             },
           ],
         });
       } else if (!res) {
-        console.log("ZAP RUN STOPPED DUE TO FALSE FILTER CONDITION");
+        console.log("FLOW RUN STOPPED DUE TO FALSE FILTER CONDITION");
       } else {
         console.log("THIS IS THE LAST STAGE");
       }
