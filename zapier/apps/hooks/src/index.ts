@@ -34,6 +34,6 @@ app.post("/hooks/catch/:userId/:zapId", async (req, res) => {
   res.send("ZapRun added");
 });
 
-app.listen(3001, () => {
-  console.log("Hook server listening on port 3001");
+app.listen(3002, () => {
+  console.log("Hook server listening on port 3002");
 });

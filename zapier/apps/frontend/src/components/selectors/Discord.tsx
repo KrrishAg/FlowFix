@@ -20,7 +20,7 @@ export const Discord = ({
           placeholder="url"
           onChange={(e) => setUrl(e.target.value)}
         />
-        <p className="text-xs">(Need to be a real discord webhook url, if unsure leave empty, message will be sent to Krrish's pvt channel)</p>
+        <p className="text-xs">{`(Need to be a real discord webhook url, if unsure leave empty, message will be sent to Krrish's pvt channel)`}</p>
         <Input
           label="Message: "
           placeholder="Type message..."

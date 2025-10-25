@@ -172,6 +172,7 @@ function ZapTable({
           </div>
           <div className="flex-1">{z.id}</div>
           <div className="flex-1">{new Date(z.date).toLocaleDateString()}</div>
+          {/* @ts-expect-error: huh */}
           <div className="flex-1">{`${HOOKS_URL}/hooks/catch/${jwtDecode(localStorage.getItem("token") as string).id}/${z.id}`}</div>
           <div className="flex-1">
             <LinkButton

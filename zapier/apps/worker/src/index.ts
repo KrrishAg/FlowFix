@@ -10,6 +10,9 @@ import { sendTelegramMessage } from "./telegram.js";
 import { sendDataToFilter } from "./filter.js";
 import { sendRazorpay } from "./razorpay.js";
 import { createNotion } from "./notion.js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 //sent data this from postman, so this was stores aas zapRun's metadata
 // {
@@ -22,9 +25,12 @@ import { createNotion } from "./notion.js";
 //solana data what I filled in those fields on FE: { "amount" : " {comment. amount}" , " address" : " {comment. address}
 //email data what I filled in those fields on FE: {"body" : "You have received a bounty of {comment. amount}, Thanks to krrish", "email " : "{comment . email}"}
 
+//broekr name in docker-compose
+const broker = "localhost:9092";
+
 const kafka = new Kafka({
   clientId: "worker-process",
-  brokers: ["localhost:9092"],
+  brokers: [broker],
 });
 
 async function main() {

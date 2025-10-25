@@ -1,10 +1,16 @@
 import prisma from "@repo/db/client";
 import { Kafka } from "kafkajs";
 import { TOPIC_NAME } from "@repo/common/config";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+//broekr name in docker-compose
+const broker = "localhost:9092";
 
 const kafka = new Kafka({
   clientId: "outbox-processor",
-  brokers: ["localhost:9092"],
+  brokers: [broker],
 });
 
 async function main() {

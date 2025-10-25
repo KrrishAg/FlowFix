@@ -11,7 +11,7 @@ export const Appbar = () => {
   // const [token, setToken] = useState(localStorage.getItem("token") || "");
   const token = localStorage.getItem("token");
   const [name, setName] = useState("");
-  const [toggle, setToggle] = useState(true);
+  const [, setToggle] = useState(true);
 
   useEffect(() => {
     if (token)

@@ -23,6 +23,6 @@ app.use("/api/v1/usercred", userCredRouter);
 
 app.use("/api/v1/notion", notionRouter);
 
-app.listen(3000, () => {
-  console.log("Primary backend listening on prt 3000");
+app.listen(3001, () => {
+  console.log("Primary backend listening on prt 3001");
 });

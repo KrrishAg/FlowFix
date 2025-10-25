@@ -21,7 +21,6 @@ interface Action {
     image: string;
   };
 }
-[];
 
 function useAvailableActionsAndTriggers() {
   const [availableActions, setAvailableActions] = useState([]);

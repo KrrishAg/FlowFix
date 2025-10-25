@@ -68,6 +68,7 @@ export default function ModalZaprun({
                 onClick={() => {
                   console.log(text);
                   axios.post(
+                    //@ts-expect-error: huh
                     `${HOOKS_URL}/hooks/catch/${jwtDecode(localStorage.getItem("token") as string).id}/${zapId}`,
                     JSON.parse(text),
                     {
