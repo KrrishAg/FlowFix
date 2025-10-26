@@ -1,5 +1,4 @@
 "use client";
-import { CheckFeature } from "@/components/CheckFeature";
 import { Input } from "@/components/Input";
 import { PrimaryButton } from "@/components/buttons/PrimaryButton";
 import axios from "axios";
@@ -74,7 +73,7 @@ export default function SignInPage() {
           {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
 
           <div>
-            <PrimaryButton onClick={handleSignIn} size="big">
+            <PrimaryButton onClick={handleSignIn} size="big" className="bg-blue-700 text-white">
               {loading ? "Signing In..." : "Sign In"}
             </PrimaryButton>
           </div>

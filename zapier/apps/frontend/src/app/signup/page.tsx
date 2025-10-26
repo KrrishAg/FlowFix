@@ -1,5 +1,4 @@
 "use client";
-import { CheckFeature } from "@/components/CheckFeature";
 import { Input } from "@/components/Input";
 import { PrimaryButton } from "@/components/buttons/PrimaryButton";
 import axios from "axios";
@@ -7,6 +6,7 @@ import { useState } from "react";
 import { BACKEND_URL } from "../config";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { CheckFeature } from "@/components/CheckFeature";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -101,7 +101,11 @@ export default function SignUpPage() {
             {error && <p className="text-red-500 text-sm mt-2 mb-4">{error}</p>}
 
             <div className="mt-6">
-              <PrimaryButton onClick={handleSignUp} size="big">
+              <PrimaryButton
+                onClick={handleSignUp}
+                size="big"
+                className="bg-blue-700 text-white"
+              >
                 {loading ? "Signing Up..." : "Sign Up"}
               </PrimaryButton>
             </div>

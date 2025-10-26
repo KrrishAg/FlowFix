@@ -46,61 +46,55 @@ export const Appbar = () => {
 
   return (
     <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo/Brand */}
-          <div className="flex-shrink-0 flex items-center">
-            <Link
-              href="/"
-              className="text-2xl font-bold text-indigo-600 hover:text-indigo-800 transition"
-            >
-              FlowFix
-            </Link>
-          </div>
+      <div className="flex justify-between items-center h-16 px-10">
+        {/* Left Part*/}
+        <div className="flex-shrink-0 flex items-center">
+          <Link
+            href="/"
+            className="text-4xl font-black text-indigo-600 hover:text-indigo-800 transition"
+          >
+            FlowFix
+          </Link>
+        </div>
 
-          {/* Nav Links/Actions */}
-          <div className="flex items-center space-x-4">
-            {token ? (
-              // --- Logged In State ---
-              <>
-                <span className="text-sm text-gray-700 hidden sm:block">
-                  Hello,{" "}
-                  <span className="font-semibold text-gray-900">
-                    {name || "User"}
-                  </span>
+        {/* Right Part*/}
+        <div className="flex items-center space-x-4">
+          {token ? (
+            // Logged In State
+            <>
+              <span className="text-lg text-gray-700 hidden sm:block">
+                Hello,{" "}
+                <span className="font-semibold text-gray-900">
+                  {name || "User"}
                 </span>
-                {/* Add other nav links for logged-in users if needed */}
-                <Link
-                  href="/dashboard"
-                  className="text-gray-600 hover:text-gray-900 font-medium px-3 py-2 rounded-md text-sm transition"
-                >
-                  Dashboard
-                </Link>
-                <PrimaryButton
-                  onClick={handleLogout}
-                  // className="py-1.5 px-3 text-sm"
-                >
-                  {" "}
-                  {/* Smaller button */}
-                  Logout
-                </PrimaryButton>
-              </>
-            ) : (
-              // --- Logged Out State ---
-              <>
-                {/* Optionally add marketing links like Pricing, Features */}
-                <LinkButton onClick={() => router.push("/login")}>
-                  Login
-                </LinkButton>
-                <PrimaryButton
-                  onClick={() => router.push("/signup")}
-                  // className="py-1.5 px-3 text-sm"
-                >
-                  Sign Up Free
-                </PrimaryButton>
-              </>
-            )}
-          </div>
+              </span>
+              <Link
+                href="/dashboard"
+                className="text-gray-600 hover:text-gray-900 font-medium px-3 py-2 rounded-md text-base transition"
+              >
+                Dashboard
+              </Link>
+              <PrimaryButton
+                onClick={handleLogout}
+                className="bg-blue-700 text-white"
+              >
+                Logout
+              </PrimaryButton>
+            </>
+          ) : (
+            // Logged Out State
+            <>
+              <LinkButton onClick={() => router.push("/login")}>
+                Login
+              </LinkButton>
+              <PrimaryButton
+                onClick={() => router.push("/signup")}
+                className="bg-blue-700 text-white"
+              >
+                Sign Up Free
+              </PrimaryButton>
+            </>
+          )}
         </div>
       </div>
     </nav>

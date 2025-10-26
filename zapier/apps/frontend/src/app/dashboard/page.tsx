@@ -226,20 +226,18 @@ function FlowTable({
 
   return (
     <div className="bg-white shadow overflow-hidden rounded-lg border border-gray-200 pt-3">
-      <div className="grid grid-cols-[2fr_5fr_2fr_5fr_2fr] border-b">
-        <div className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+      <div className="grid grid-cols-[2fr_5fr_2fr_5fr_2fr] border-b font-bold text-gray-600">
+        <div className="px-6 py-3 text-left uppercase tracking-wider">
           Flow Steps
         </div>
-        <div className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-          ID
-        </div>
-        <div className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+        <div className="px-6 py-3 text-left uppercase tracking-wider">ID</div>
+        <div className="px-6 py-3 text-left uppercase tracking-wider">
           Created
         </div>
-        <div className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+        <div className="px-6 py-3 text-left uppercase tracking-wider">
           Webhook URL
         </div>
-        <div className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider place-self-center">
+        <div className="px-6 py-3 text-left uppercase tracking-wider place-self-center">
           Actions
         </div>
       </div>
@@ -256,8 +254,8 @@ function FlowTable({
                 <Image
                   src={flow.trigger.AvailableTrigger.image}
                   alt={flow.trigger.AvailableTrigger.name}
-                  width={24}
-                  height={24}
+                  width={30}
+                  height={30}
                   className="rounded"
                   title={flow.trigger.AvailableTrigger.name} // Tooltip
                 />
