@@ -319,7 +319,7 @@ function FlowTable({
               Delete
             </LinkButton>
             <LinkButton onClick={() => setSelectedFlowId(flow.id)}>
-              Runs
+              Run
             </LinkButton>
           </div>
         </div>

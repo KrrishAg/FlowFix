@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Input } from "../Input";
-import { PrimaryButton } from "../buttons/PrimaryButton";
 import { Select } from "../Select";
+import { DarkButton } from "../buttons/DarkButton";
 
 export const Filter = ({
   setMetadata,
@@ -31,6 +31,10 @@ export const Filter = ({
     "exists",
   ];
 
+  const handleSubmit = () => {
+    setMetadata({ logic, condition1, condition2 });
+  };
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-3">
@@ -43,6 +47,7 @@ export const Filter = ({
               field: e.target.value,
             }))
           }
+          type="text"
         />
         <Select
           label="Select operator condition"
@@ -64,6 +69,7 @@ export const Filter = ({
               value: e.target.value,
             }))
           }
+          type="text"
         />
       </div>
 
@@ -84,6 +90,7 @@ export const Filter = ({
               field: e.target.value,
             }))
           }
+          type="text"
         />
         <Select
           label="Select operator condition"
@@ -105,15 +112,13 @@ export const Filter = ({
               value: e.target.value,
             }))
           }
+          type="text"
         />
       </div>
-      <PrimaryButton
-        onClick={() => {
-          setMetadata({ logic, condition1, condition2 });
-        }}
-      >
-        Submit
-      </PrimaryButton>
+
+      <div className="mt-6 flex justify-end">
+        <DarkButton onClick={handleSubmit}>Save Action</DarkButton>
+      </div>
     </div>
   );
 };

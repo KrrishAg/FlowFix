@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Input } from "../Input";
-import { PrimaryButton } from "../buttons/PrimaryButton";
 import axios from "axios";
 import { BACKEND_URL } from "@/app/config";
+import { DarkButton } from "../buttons/DarkButton";
 
 export const Notion = ({
   setMetadata,
@@ -27,6 +27,14 @@ export const Notion = ({
   const [values, setValues] = useState<
     Record<string, { type: string; value: string }>
   >({});
+
+  const handleSubmit = () => {
+    if (!selectedDatabase) {
+      alert("Please select a database");
+      return;
+    }
+    setMetadata({ ...values, dbId: selectedDatabase });
+  };
 
   async function getDatabases() {
     const res = await axios.get(`${BACKEND_URL}/api/v1/notion/databases`, {
@@ -116,43 +124,52 @@ export const Notion = ({
                   />
                 </div>
               ))}
-              <PrimaryButton
-                onClick={() => {
-                  setMetadata({ ...values, dbId: selectedDatabase });
-                }}
-              >
-                Submit
-              </PrimaryButton>
+              <div className="mt-6 flex justify-end">
+                <DarkButton onClick={handleSubmit}>Save Action</DarkButton>
+              </div>
             </div>
           )}
         </div>
       ) : (
         <div>
+          <div className="mb-4 font-medium">
+            <h2>Steps:</h2>
+            <p>
+              1. User need to create a notion api key from their notion account
+            </p>
+            <p>
+              2. Add a connection from that api key to the DATABSES user wants
+              to connect.
+            </p>
+          </div>
           <Input
             label="API KEY: "
             placeholder="enter notion api key"
             onChange={(e) => setApikey(e.target.value)}
+            type="text"
           />
-          <PrimaryButton
-            onClick={async () => {
-              await axios.post(
-                `${BACKEND_URL}/api/v1/usercred/setapi`,
-                {
-                  service: "NOTION",
-                  apikey,
-                },
-                {
-                  headers: {
-                    Authorization: localStorage.getItem("token"),
+          <div className="mt-6 flex justify-center">
+            <DarkButton
+              onClick={async () => {
+                await axios.post(
+                  `${BACKEND_URL}/api/v1/usercred/setapi`,
+                  {
+                    service: "NOTION",
+                    apikey,
                   },
-                }
-              );
-              setIsConnected(true);
-              getDatabases();
-            }}
-          >
-            Submit
-          </PrimaryButton>
+                  {
+                    headers: {
+                      Authorization: localStorage.getItem("token"),
+                    },
+                  }
+                );
+                setIsConnected(true);
+                getDatabases();
+              }}
+            >
+              Submit
+            </DarkButton>
+          </div>
         </div>
       )}
       <p className="text-center -mt-4 text-sm">

@@ -20,7 +20,7 @@ export const Input = ({
         <label className="text-base font-medium">{label}</label>
       </div>
       <input
-        className="border rounded px-4 py-2 w-full border-black"
+        className="border rounded px-4 py-2 w-full border-indigo-400"
         type={type === "password" && showPassword ? "text" : type}
         placeholder={placeholder}
         onChange={onChange}

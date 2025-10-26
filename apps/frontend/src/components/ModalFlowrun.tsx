@@ -4,8 +4,8 @@ import { useState } from "react";
 import axios from "axios";
 import { HOOKS_URL } from "@/app/config";
 import { jwtDecode } from "jwt-decode";
-import { PrimaryButton } from "./buttons/PrimaryButton";
 import { EnhancedTextarea } from "./TextArea";
+import { DarkButton } from "./buttons/DarkButton";
 
 export default function ModalFlowrun({
   flowId,
@@ -64,7 +64,7 @@ export default function ModalFlowrun({
                 /> */}
 
               <EnhancedTextarea setText={setText} />
-              <PrimaryButton
+              <DarkButton
                 onClick={() => {
                   console.log(text);
                   axios.post(
@@ -78,7 +78,7 @@ export default function ModalFlowrun({
                 }}
               >
                 Submit
-              </PrimaryButton>
+              </DarkButton>
             </div>
           </div>
         </div>
