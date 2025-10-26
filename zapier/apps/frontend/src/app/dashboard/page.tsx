@@ -225,8 +225,8 @@ function FlowTable({
   };
 
   return (
-    <div className="bg-white shadow overflow-hidden rounded-lg border border-gray-200 py-3">
-      <div className="grid grid-cols-[2fr_5fr_2fr_5fr_2fr]">
+    <div className="bg-white shadow overflow-hidden rounded-lg border border-gray-200 pt-3">
+      <div className="grid grid-cols-[2fr_5fr_2fr_5fr_2fr] border-b">
         <div className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
           Flow Steps
         </div>
@@ -247,7 +247,7 @@ function FlowTable({
       {flows.map((flow) => (
         <div
           key={flow.id}
-          className="hover:bg-gray-50 grid grid-cols-[2fr_5fr_2fr_5fr_2fr]"
+          className="hover:bg-gray-50 grid grid-cols-[2fr_5fr_2fr_5fr_2fr] border-b py-3"
         >
           <div className="px-6 py-4 whitespace-nowrap">
             <div className="flex items-center space-x-2">

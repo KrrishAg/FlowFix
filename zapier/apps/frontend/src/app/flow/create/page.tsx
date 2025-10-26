@@ -7,40 +7,54 @@ import { PrimaryButton } from "@/components/buttons/PrimaryButton";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { DarkButton } from "@/components/buttons/DarkButton";
 
 function useAvailableActionsAndTriggers() {
   const [availableActions, setAvailableActions] = useState([]);
   const [availableTriggers, setAvailableTriggers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    axios
-      .get(`${BACKEND_URL}/api/v1/action/available`, {
-        headers: {
-          Authorization: localStorage.getItem("token"),
-        },
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setError("Not authenticated");
+      setLoading(false);
+      return;
+    }
+    const headers = { Authorization: token };
+
+    Promise.all([
+      axios.get(`${BACKEND_URL}/api/v1/action/available`, { headers }),
+      axios.get(`${BACKEND_URL}/api/v1/trigger/available`, { headers }),
+    ])
+      .then(([actionsRes, triggersRes]) => {
+        setAvailableActions(actionsRes.data.availableActions || []);
+        setAvailableTriggers(triggersRes.data.availableTriggers || []);
       })
-      .then((res) => setAvailableActions(res.data.availableActions));
-    axios
-      .get(`${BACKEND_URL}/api/v1/trigger/available`, {
-        headers: {
-          Authorization: localStorage.getItem("token"),
-        },
+      .catch((err) => {
+        console.error("Error fetching available items:", err);
+        setError("Failed to load available triggers/actions.");
       })
-      .then((res) => setAvailableTriggers(res.data.availableTriggers));
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
-  return { availableActions, availableTriggers };
+  return { availableActions, availableTriggers, loading, error };
 }
 
-export default function Page() {
+// --- Main Page Component ---
+export default function CreateFlowPage() {
   useAuthRedirect();
-
   const router = useRouter();
-  //get avl actions and triggers from backend
-  const { availableActions, availableTriggers } =
-    useAvailableActionsAndTriggers();
+  const {
+    availableActions,
+    availableTriggers,
+    loading: loadingAvailable,
+    error: availableError,
+  } = useAvailableActionsAndTriggers();
 
-  //which trigger is chosen
   const [selectedTrigger, setSelectedTrigger] = useState<{
     id: string;
     name: string;
@@ -58,14 +72,19 @@ export default function Page() {
     }[]
   >([]);
 
-  //to see which flowbox has been selected
-  const [modelIndex, setModelIndex] = useState<null | number>(null);
+  const [modalForStep, setModalForStep] = useState<null | number>(null); // Step index (1 for trigger, 2+ for actions)
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [publishError, setPublishError] = useState("");
 
-  function addAction() {
-    setSelectedActions((a) => [
-      ...a,
+  // Add a new empty action slot
+  function addActionSlot() {
+    setSelectedActions((prevActions) => [
+      ...prevActions,
       {
-        idx: a.length + 2,
+        idx:
+          (prevActions.length > 0
+            ? Math.max(...prevActions.map((a) => a.idx))
+            : 1) + 1, // Ensure unique, sequential index
         availableActionId: "",
         availableActionName: "",
         availableActionImage: "",
@@ -74,142 +93,194 @@ export default function Page() {
     ]);
   }
 
-  function changeModelLayout(
-    params: null | { name: string; id: string; metadata: any; image: string }
+  // Handle selection from the modal
+  function handleModalSelection(
+    selectedItem: null | {
+      name: string;
+      id: string;
+      metadata: any;
+      image: string;
+    }
   ) {
-    if (params === null) {
-      //clciked on cross
-    } else if (modelIndex === 1) {
-      //chose a trigger
-      setSelectedTrigger({
-        id: params.id,
-        name: params.name,
-        image: params.image,
-      });
-    } else if (modelIndex != undefined) {
-      //chose an action, so chnaging its data in the array, its at idx-1
-      setSelectedActions((a) => {
-        const newActs = [...a];
-        newActs[modelIndex - 2] = {
-          idx: modelIndex,
-          availableActionId: params.id,
-          availableActionName: params.name,
-          availableActionImage: params.image,
-          metadata: params.metadata,
-        };
-        return newActs;
+    if (selectedItem === null) {
+      // Modal closed without selection
+      setModalForStep(null);
+      return;
+    }
+
+    if (modalForStep === 1) {
+      // Trigger selected
+      setSelectedTrigger(selectedItem);
+    } else if (modalForStep !== null && modalForStep > 1) {
+      // Action selected
+      setSelectedActions((prevActions) => {
+        return prevActions.map((action) =>
+          action.idx === modalForStep
+            ? {
+                ...action,
+                availableActionId: selectedItem.id,
+                availableActionName: selectedItem.name,
+                availableActionImage: selectedItem.image,
+                metadata: selectedItem.metadata || {}, // Store metadata if provided
+              }
+            : action
+        );
       });
     }
-    setModelIndex(null);
+    setModalForStep(null); // Close modal
   }
 
-  function removeAction(actIndex: number) {
-    //since dif of 2 in index of action array, to show in serial
-    const idx = actIndex - 2;
-
-    setSelectedActions((a) => {
-      const tmpActions = a.filter((xx) => xx.idx !== actIndex);
-      console.log(a);
-      const newActions = tmpActions.map((action, i) => {
-        if (i < idx) return { ...action };
-        else {
-          return { ...action, idx: action.idx - 1 };
-        }
-      });
-      console.log(newActions);
-      return newActions;
+  // Remove an action and re-index subsequent actions
+  function removeAction(stepIndexToRemove: number) {
+    setSelectedActions((prevActions) => {
+      const filteredActions = prevActions.filter(
+        (action) => action.idx !== stepIndexToRemove
+      );
+      // Re-index remaining actions sequentially starting from 2
+      return filteredActions.map((action, i) => ({
+        ...action,
+        idx: i + 2, // Index 2, 3, 4...
+      }));
     });
   }
 
+  // Publish the flow
+  async function publishFlow() {
+    setPublishError("");
+    if (!selectedTrigger?.id) {
+      setPublishError("Please select a trigger.");
+      return;
+    }
+    if (
+      selectedActions.length === 0 ||
+      selectedActions.some((a) => !a.availableActionId)
+    ) {
+      setPublishError(
+        "Please select at least one action and configure all action steps."
+      );
+      return;
+    }
+
+    setIsPublishing(true);
+    try {
+      await axios.post(
+        `${BACKEND_URL}/api/v1/flow/createFlow`,
+        {
+          availableTriggerId: selectedTrigger.id,
+          triggerMetaData: {}, // Add trigger metadata if needed
+          actions: selectedActions.map((action) => ({
+            availableActionId: action.availableActionId,
+            actionMetaData: action.metadata,
+            // Ensure sortingOrder is passed if your backend needs it explicitly
+            // sortingOrder: action.idx - 1 // Example if 0-based index needed
+          })),
+        },
+        { headers: { Authorization: localStorage.getItem("token") } }
+      );
+      router.push("/dashboard"); // Redirect on success
+    } catch (err: any) {
+      console.error("Publish error:", err);
+      setPublishError(
+        err.response?.data?.error || "Failed to publish flow. Please try again."
+      );
+    } finally {
+      setIsPublishing(false);
+    }
+  }
+
+  // --- Render ---
   return (
-    <div>
-      <button
-        className="px-8 py-2 cursor-pointer hover:shadow-md bg-purple-700 text-white rounded-full text-center flex justify-center flex-col absolute right-2 top-20"
-        onClick={async () => {
-          //returning if no trigger selected
-          if (!selectedTrigger?.id) {
-            alert("Kindly select a trigger");
-            return;
-          }
-          const find = selectedActions.find(
-            (action) => !action.availableActionId
-          );
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-12 px-4">
+      {/* Header */}
+      <div className="max-w-3xl mx-auto mb-8 flex justify-between items-center">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+          Create New Flow
+        </h1>
+        <DarkButton onClick={publishFlow}>
+          {isPublishing ? "Publishing..." : "Publish Flow"}
+        </DarkButton>
+      </div>
 
-          //returning if no action selected or some action not chosen
-          if (find || selectedActions.length === 0) {
-            alert("Kindly choose the actions");
-            return;
-          }
-
-          await axios.post(
-            `${BACKEND_URL}/api/v1/flow/createFlow`,
-            {
-              availableTriggerId: selectedTrigger?.id,
-              triggerMetaData: {},
-              actions: selectedActions.map((action) => ({
-                availableActionId: action.availableActionId,
-                actionMetaData: action.metadata,
-              })),
-            },
-            {
-              headers: {
-                Authorization: localStorage.getItem("token"),
-              },
-            }
-          );
-          router.push("/dashboard");
-        }}
-      >
-        Publish
-      </button>
-      <div className="w-full min-h-screen bg-slate-200 flex flex-col justify-center">
-        <div className="flex justify-center w-full">
-          <FlowCell
-            onClick={() => {
-              setModelIndex(1);
-            }}
-            name={selectedTrigger?.name ? selectedTrigger.name : "Trigger"}
-            index={1}
-            image={selectedTrigger?.image ? selectedTrigger.image : ""}
-          />
+      {publishError && (
+        <div
+          className="max-w-3xl mx-auto mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded text-center"
+          role="alert"
+        >
+          {publishError}
         </div>
-        <div className="w-full pt-2 pb-2">
-          {selectedActions.map((action, index) => (
-            <div key={index} className="pt-2 flex justify-center">
+      )}
+
+      {loadingAvailable && (
+        <p className="text-center text-gray-600">Loading available steps...</p>
+      )}
+      {availableError && (
+        <p className="text-center text-red-600">Error: {availableError}</p>
+      )}
+
+      {/* Flow Steps */}
+      {!loadingAvailable && !availableError && (
+        <div className="flex flex-col items-center space-y-4 max-w-xl mx-auto">
+          {/* Trigger */}
+          <FlowCell
+            onClick={() => setModalForStep(1)}
+            name={selectedTrigger?.name}
+            index={1}
+            image={selectedTrigger?.image || ""}
+          />
+
+          {/* Connecting Line + Actions */}
+          {selectedActions.map((action) => (
+            <>
+              {/* Vertical connecting line */}
+              <div className="h-8 w-px bg-gray-300"></div>
+
               <FlowCell
-                onClick={() => {
-                  setModelIndex(action.idx);
-                }}
-                name={
-                  action.availableActionName
-                    ? action.availableActionName
-                    : "Action"
-                }
+                key={action.idx} // Use a stable key if possible, idx might change on delete
+                onClick={() => setModalForStep(action.idx)}
+                name={action.availableActionName}
                 index={action.idx}
-                image={
-                  action?.availableActionImage
-                    ? action.availableActionImage
-                    : ""
-                }
+                image={action.availableActionImage || ""}
                 removeAction={removeAction}
               />
-            </div>
+            </>
           ))}
+
+          {/* Connecting Line + Add Button */}
+          {selectedTrigger && ( // Show add button only after trigger is selected
+            <>
+              <div className="h-8 w-px bg-gray-300"></div>
+              <button
+                onClick={addActionSlot}
+                className="w-full max-w-xs sm:max-w-sm p-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-indigo-500 hover:text-indigo-600 transition duration-150 ease-in-out flex items-center justify-center space-x-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  className="size-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 4.5v15m7.5-7.5h-15"
+                  />
+                </svg>
+                <span>Add Action</span>
+              </button>
+            </>
+          )}
         </div>
-        <div className="flex justify-center">
-          <div>
-            <PrimaryButton onClick={addAction}>
-              <div className="text-2xl">+</div>
-            </PrimaryButton>
-          </div>
-        </div>
-      </div>
-      {modelIndex && (
+      )}
+
+      {/* Modal */}
+      {modalForStep !== null && (
         <Modal
-          index={modelIndex}
-          onSelect={changeModelLayout}
+          index={modalForStep}
+          onSelect={handleModalSelection}
           availableItems={
-            modelIndex === 1 ? availableTriggers : availableActions
+            modalForStep === 1 ? availableTriggers : availableActions
           }
         />
       )}
