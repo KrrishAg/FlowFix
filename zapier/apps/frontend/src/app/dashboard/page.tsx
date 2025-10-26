@@ -38,6 +38,7 @@ interface Flow {
   };
 }
 
+// Hook to fetch flows (from your code, minor adjustments)
 function useFlows() {
   const [loading, setLoading] = useState(true);
   const [flows, setFlows] = useState<Flow[]>([]);
@@ -224,123 +225,107 @@ function FlowTable({
   };
 
   return (
-    <div className="bg-white shadow overflow-hidden rounded-lg border border-gray-200">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
-          <tr>
-            <th
-              scope="col"
-              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              Flow Steps
-            </th>
-            <th
-              scope="col"
-              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              ID
-            </th>
-            <th
-              scope="col"
-              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              Created
-            </th>
-            <th
-              scope="col"
-              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              Webhook URL
-            </th>
-            <th scope="col" className="relative px-6 py-3">
-              <span className="sr-only">Actions</span>
-            </th>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {flows.map((flow) => (
-            <tr key={flow.id} className="hover:bg-gray-50">
-              <td className="px-6 py-4 whitespace-nowrap">
-                <div className="flex items-center space-x-2">
-                  {/* Trigger Icon */}
-                  {flow.trigger?.AvailableTrigger?.image && (
+    <div className="bg-white shadow overflow-hidden rounded-lg border border-gray-200 py-3">
+      <div className="grid grid-cols-[2fr_5fr_2fr_5fr_2fr]">
+        <div className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+          Flow Steps
+        </div>
+        <div className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+          ID
+        </div>
+        <div className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+          Created
+        </div>
+        <div className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+          Webhook URL
+        </div>
+        <div className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider place-self-center">
+          Actions
+        </div>
+      </div>
+
+      {flows.map((flow) => (
+        <div
+          key={flow.id}
+          className="hover:bg-gray-50 grid grid-cols-[2fr_5fr_2fr_5fr_2fr]"
+        >
+          <div className="px-6 py-4 whitespace-nowrap">
+            <div className="flex items-center space-x-2">
+              {/* Trigger Icon */}
+              {flow.trigger?.AvailableTrigger?.image && (
+                <Image
+                  src={flow.trigger.AvailableTrigger.image}
+                  alt={flow.trigger.AvailableTrigger.name}
+                  width={24}
+                  height={24}
+                  className="rounded"
+                  title={flow.trigger.AvailableTrigger.name} // Tooltip
+                />
+              )}
+              {/* Action Icons */}
+              {flow.actions.map(
+                (action) =>
+                  action.AvailableAction?.image && (
                     <Image
-                      src={flow.trigger.AvailableTrigger.image}
-                      alt={flow.trigger.AvailableTrigger.name}
+                      key={action.id}
+                      src={action.AvailableAction.image}
+                      alt={action.AvailableAction.name}
                       width={24}
                       height={24}
                       className="rounded"
-                      title={flow.trigger.AvailableTrigger.name} // Tooltip
+                      title={action.AvailableAction.name} // Tooltip
                     />
-                  )}
-                  {/* Action Icons */}
-                  {flow.actions.map(
-                    (action) =>
-                      action.AvailableAction?.image && (
-                        <Image
-                          key={action.id}
-                          src={action.AvailableAction.image}
-                          alt={action.AvailableAction.name}
-                          width={24}
-                          height={24}
-                          className="rounded"
-                          title={action.AvailableAction.name} // Tooltip
-                        />
-                      )
-                  )}
-                </div>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {flow.id}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {new Date(flow.date).toLocaleDateString()}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {userId ? (
-                  // Basic copy-to-clipboard functionality
-                  <button
-                    title="Click to copy Webhook URL"
-                    className="truncate hover:underline focus:outline-none"
-                    onClick={() => {
-                      const url = `${HOOKS_URL}/hooks/catch/${userId}/${flow.id}`;
-                      navigator.clipboard.writeText(url).then(
-                        () => {
-                          alert("Webhook URL copied!"); // Simple confirmation
-                        },
-                        (err) => {
-                          console.error("Failed to copy text: ", err);
-                          alert("Failed to copy URL.");
-                        }
-                      );
-                    }}
-                  >
-                    {`${HOOKS_URL}/hooks/catch/${userId}/${flow.id.substring(0, 8)}...`}
-                  </button>
-                ) : (
-                  <span>Loading...</span>
-                )}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-4">
-                <LinkButton
-                  onClick={() => router.push(`/flow/edit/${flow.id}`)}
-                >
-                  Edit
-                </LinkButton>
-                <LinkButton
-                  onClick={() => handleDelete(flow.id)}
-                  className="text-red-600 hover:text-red-800"
-                >
-                  Delete
-                </LinkButton>
-                <LinkButton onClick={() => setSelectedFlowId(flow.id)}>
-                  Runs
-                </LinkButton>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                  )
+              )}
+            </div>
+          </div>
+          <div className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            {flow.id}
+          </div>
+          <div className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            {new Date(flow.date).toLocaleDateString()}
+          </div>
+          <div className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            {userId ? (
+              // Basic copy-to-clipboard functionality
+              <button
+                title="Click to copy Webhook URL"
+                className="truncate hover:underline focus:outline-none"
+                onClick={() => {
+                  const url = `${HOOKS_URL}/hooks/catch/${userId}/${flow.id}`;
+                  navigator.clipboard.writeText(url).then(
+                    () => {
+                      alert("Webhook URL copied!"); // Simple confirmation
+                    },
+                    (err) => {
+                      console.error("Failed to copy text: ", err);
+                      alert("Failed to copy URL.");
+                    }
+                  );
+                }}
+              >
+                {`${HOOKS_URL}/hooks/catch/${userId}/${flow.id.substring(0, 9)}...`}
+              </button>
+            ) : (
+              <span>Loading...</span>
+            )}
+          </div>
+          <div className="text-right text-sm font-medium flex flex-col justify-between">
+            <LinkButton onClick={() => router.push(`/flow/edit/${flow.id}`)}>
+              Edit
+            </LinkButton>
+            <LinkButton
+              onClick={() => handleDelete(flow.id)}
+              className="text-red-600 hover:text-red-800"
+            >
+              Delete
+            </LinkButton>
+            <LinkButton onClick={() => setSelectedFlowId(flow.id)}>
+              Runs
+            </LinkButton>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
