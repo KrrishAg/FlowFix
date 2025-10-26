@@ -6,12 +6,12 @@ export const Input = ({
   label,
   placeholder,
   onChange,
-  isPass = false,
+  type,
 }: {
   label: string;
   placeholder: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  isPass?: boolean;
+  type: string;
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   return (
@@ -21,12 +21,12 @@ export const Input = ({
       </div>
       <input
         className="border rounded px-4 py-2 w-full border-black"
-        type={isPass && !showPassword ? "password" : "text"}
+        type={type === "password" && showPassword ? "text" : type}
         placeholder={placeholder}
         onChange={onChange}
       />
 
-      {isPass && (
+      {type === "password" && (
         <span
           onClick={() => setShowPassword(!showPassword)}
           className="absolute right-1 top-[52%] cursor-pointer text-xl hover:bg-gray-100 p-1"

@@ -28,7 +28,7 @@ userRouter.post("/signup", async (req, res) => {
     const hashedPassword =
       (await bcrypt.hash(parsedData.data.password, 10)) || "";
 
-    await prisma.user.create({
+    const user = await prisma.user.create({
       data: {
         email: parsedData.data.username,
         password: hashedPassword,
@@ -37,9 +37,16 @@ userRouter.post("/signup", async (req, res) => {
     });
 
     //await send email
+    if (!jwtsecret) {
+      return res
+        .status(411)
+        .json({ error: "No jwt secret found in signin endpoint" });
+    }
+    const token = jwt.sign({ id: user.id }, jwtsecret);
 
     res.json({
       message: "User created",
+      token,
     });
   } catch (error) {
     console.log("ERROR", error);

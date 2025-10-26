@@ -31,7 +31,7 @@ app.post("/hooks/catch/:userId/:flowId", async (req, res) => {
     //maybe push it onto a queue like redis or kafka
   });
 
-  res.send("ZapRun added");
+  res.send("FlowRun added");
 });
 
 app.listen(3002, () => {

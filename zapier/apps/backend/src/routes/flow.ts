@@ -5,7 +5,7 @@ import prisma from "@repo/db/client";
 
 export const flowRouter = express.Router();
 
-//creating a zap
+//creating a flow
 flowRouter.post("/createFlow", authMiddleware, async (req, res) => {
   try {
     //@ts-ignore

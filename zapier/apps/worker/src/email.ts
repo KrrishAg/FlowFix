@@ -29,7 +29,7 @@ export async function sendEmail(emailData: EmailDatatype) {
     const { data, error } = await resend.emails.send({
       from: "Krrish <onboarding@resend.dev>",
       to: [email],
-      subject: `Email from ZAPIER`,
+      subject: `Email from FLOWFIX`,
       html: emailContent,
     });
 
