@@ -26,7 +26,7 @@ export default function SignInPage() {
       if (res.data && res.data.token) {
         localStorage.setItem("token", res.data.token);
         window.dispatchEvent(new Event("authChange")); // Notify Appbar
-        router.push("/");
+        router.push("/dashboard");
       }
     } catch (err: any) {
       console.error("Signin error:", err);

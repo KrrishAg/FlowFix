@@ -31,7 +31,7 @@ export default function SignUpPage() {
       if (res.data && res.data.token) {
         localStorage.setItem("token", res.data.token);
         window.dispatchEvent(new Event("authChange")); // Notify Appbar
-        router.push("/");
+        router.push("/dashboard");
       } else {
         setError(
           "Signup successful, but failed to log in automatically. Please log in manually."
