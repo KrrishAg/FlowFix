@@ -38,7 +38,7 @@ export const Apireq = ({
         <div className="mt-2">
           <label className="font-medium">Headers</label>
           <textarea
-            placeholder={`Authorization":"{comment.authtoken}","factor":"{comment.factor}"}, then need to send authtoken value in comment object`}
+            placeholder={`{"Authorization":"{comment.authtoken}","factor":"{comment.factor}"}, then need to send authtoken value in comment object`}
             className="w-full border border-indigo-400 p-2 rounded h-25"
             onChange={(e) => setHeaders(e.target.value)}
           />
@@ -46,7 +46,7 @@ export const Apireq = ({
         <div className="mt-2">
           <label className="font-medium">Headers</label>
           <textarea
-            placeholder={`Authorization":"{comment.authtoken}","factor":"{comment.factor}"}, then need to send authtoken value in comment object`}
+            placeholder={`{"Authorization":"{comment.authtoken}","factor":"{comment.factor}"}, then need to send authtoken value in comment object`}
             className="w-full border border-indigo-400 p-2 rounded h-25"
             onChange={(e) => setBody(e.target.value)}
           />
