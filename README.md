@@ -75,9 +75,7 @@ cd ../..
 Start the API backend and Next.js frontend using the Turborepo monorepo runner:
 
 ```bash
-cd packages/db
-npx prisma migrate dev && npx prisma db seed
-cd ../..
+npm run dev
 ```
 
 The application will be accessible at http://localhost:3000.
