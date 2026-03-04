@@ -47,7 +47,7 @@ These instructions assume you have Git, Node.js, and Docker installed.
 ### 1. Clone & Install Dependencies
 
 ```bash
-git clone https://github.com/Krrish-Ag/FlowFix.git
+git clone https://github.com/KrrishAg/FlowFix.git
 cd flowfix
 npm install
 ```
