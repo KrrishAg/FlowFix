@@ -9,6 +9,7 @@ interface SmsDatatype {
 
 export async function sendSms(smsData: SmsDatatype) {
   try {
+    console.log(process.env.TWILIO_ACCOUNT_SID);
     const accountSid = process.env.TWILIO_ACCOUNT_SID;
     const authToken = process.env.TWILIO_AUTHTOKEN;
     const client = twilio(accountSid, authToken);

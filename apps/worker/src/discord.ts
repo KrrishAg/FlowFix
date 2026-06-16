@@ -14,6 +14,9 @@ export async function sendDiscordMessage(data: DiscordDatatype) {
     await axios.post(url, {
       username: "KrRiSh",
       content: `${data.message} ${data.title ? `==== [${data.title}](${data.hyperlink})` : ""}`,
+    },
+    {
+      headers: {'Content-Type': 'application/json'}
     });
     console.log("Discord message sent successfully");
   } catch (error: any) {
