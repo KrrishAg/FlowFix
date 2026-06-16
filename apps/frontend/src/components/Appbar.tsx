@@ -9,10 +9,13 @@ import Link from "next/link";
 
 export const Appbar = () => {
   const router = useRouter();
-  // const [token, setToken] = useState(localStorage.getItem("token") || "");
-  const token = localStorage.getItem("token");
+  const [token, setToken] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [, setToggle] = useState(true);
+
+  useEffect(() => {
+    setToken(localStorage.getItem("token"));
+  }, []);
 
   useEffect(() => {
     axios

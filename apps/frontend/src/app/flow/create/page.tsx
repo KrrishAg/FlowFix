@@ -3,7 +3,6 @@
 import useAuthRedirect, { BACKEND_URL } from "@/app/config";
 import Modal from "@/components/Modal";
 import { FlowCell } from "@/components/FlowCell";
-import { PrimaryButton } from "@/components/buttons/PrimaryButton";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
