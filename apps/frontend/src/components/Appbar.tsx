@@ -14,10 +14,6 @@ export const Appbar = () => {
   const [, setToggle] = useState(true);
 
   useEffect(() => {
-    setToken(localStorage.getItem("token"));
-  }, []);
-
-  useEffect(() => {
     axios
       .get(`${BACKEND_URL}/api/v1/user`, {
         headers: { Authorization: token },
@@ -27,17 +23,16 @@ export const Appbar = () => {
 
   //adding an event listner, so as to trigger change in togle which will in turn re-render appbar
   useEffect(() => {
-    // The function that runs when the doorbell rings
-    const toggleFn = () => {
-      setToggle((s) => !s);
+    const syncAuth = () => {
+      setToken(localStorage.getItem("token"));
     };
 
-    // Listening for the 'authChange' event
-    window.addEventListener("authChange", toggleFn);
+    syncAuth();
 
-    // Cleanup
+    window.addEventListener("authChange", syncAuth);
+
     return () => {
-      window.removeEventListener("authChange", toggleFn);
+      window.removeEventListener("authChange", syncAuth);
     };
   }, []);
 

@@ -74,7 +74,7 @@ async function main() {
 
       //trying to grab WHICH flow's WHICH action is currently being executed
       const currAction = flowRunDetails?.flow.actions.find(
-        (act) => act.sortOrder === stage
+        (act:any) => act.sortOrder === stage
       );
       if (!currAction) {
         console.log("No action found for the stage", stage);

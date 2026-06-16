@@ -12,7 +12,7 @@ app.post("/hooks/catch/:userId/:flowId", async (req, res) => {
   const flowId = req.params.flowId;
   const body = req.body;
 
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx:any) => {
     //storing in db
     const run = await tx.flowRun.create({
       data: {

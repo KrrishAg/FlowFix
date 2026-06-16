@@ -20,7 +20,7 @@ flowRouter.post("/createFlow", authMiddleware, async (req, res) => {
         .json({ error: "Wrong data format sent for creating a flow" });
     }
 
-    const flowId = await prisma.$transaction(async (tx) => {
+    const flowId = await prisma.$transaction(async (tx:any) => {
       //creating a flow, but will need trigger id as well
       const flow = await tx.flow.create({
         data: {
@@ -72,7 +72,7 @@ flowRouter.post("/editFlow/:flowId", authMiddleware, async (req, res) => {
     const userId: string = req.id;
     const body = req.body;
     const parsedData = flowCreateSchema.safeParse(body);
-    const flowId: string = req.params.flowId || "";
+    const flowId: string = String(req.params.flowId || "");
 
     if (!flowId) return res.status(411).json({ error: "No flow id found" });
 
@@ -83,7 +83,7 @@ flowRouter.post("/editFlow/:flowId", authMiddleware, async (req, res) => {
         .json({ error: "Wrong data format sent for editing a flow" });
     }
 
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx:any) => {
       //updating available trigger type id
       await tx.trigger.update({
         where: {

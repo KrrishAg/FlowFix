@@ -37,7 +37,7 @@ async function main() {
     //created the topic from the akfka cli
     await producer.send({
       topic: TOPIC_NAME,
-      messages: pendingRows.map((r) => ({
+      messages: pendingRows.map((r:any) => ({
         value: JSON.stringify({
           userId: r.flowRun.flow.userId,
           flowRunId: r.flowRunId,
@@ -50,7 +50,7 @@ async function main() {
     await prisma.flowRunOutbox.deleteMany({
       where: {
         id: {
-          in: pendingRows.map((r) => r.id),
+          in: pendingRows.map((r:any) => r.id),
         },
       },
     });

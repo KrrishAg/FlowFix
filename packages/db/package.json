@@ -2,9 +2,9 @@
   "name": "@repo/db",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "./dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc"
   },
   "prisma": {
     "seed": "ts-node ./src/seed.ts"
@@ -19,6 +19,6 @@
     "ts-node": "^10.9.2"
   },
   "exports": {
-    "./client": "./src/index.ts"
+    "./client": "./dist/index.js"
   }
 }
