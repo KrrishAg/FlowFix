@@ -166,7 +166,7 @@ flowRouter.get("/", authMiddleware, async (req, res) => {
 
 flowRouter.get("/:flowId", authMiddleware, async (req, res) => {
   try {
-    const flowId = req.params.flowId;
+    const flowId: string = String(req.params.flowId || "");
     //need to include everything, as showing on FE
     //@ts-ignore
     const userId: string = req.id;
@@ -198,7 +198,7 @@ flowRouter.get("/:flowId", authMiddleware, async (req, res) => {
 
 flowRouter.delete("/:flowId", authMiddleware, async (req, res) => {
   try {
-    const flowId = req.params.flowId;
+    const flowId: string = String(req.params.flowId || "");
     //need to include everything, as showing on FE
     //@ts-ignore
     const userId: string = req.id;
