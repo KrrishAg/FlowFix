@@ -1,82 +1,31 @@
 version: "3.8"
 
 services:
-  #--- Your Postgres Database ---
   postgres:
     image: postgres:14-alpine
+    restart: always
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: mypass
       POSTGRES_DB: postgres
-    restart: always
     ports:
       - "5432:5432"
 
   zookeeper:
-    image: confluentinc/cp-zookeeper:7.3.0
-    hostname: zookeeper
-    restart: always
-    ports:
-      - "2181:2181"
+    image: confluentinc/cp-zookeeper:7.8.0
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
 
-  #--- Confluent Kafka ---
   kafka:
-    image: confluentinc/cp-kafka:7.3.0
-    hostname: kafka # Added hostname for clarity
-    restart: always
-    ports:
-      # Port 9092 for external connections from your host machine
-      - "9092:9092"
-    environment:
-      # --- Essential Config ---
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
-
-      # Define TWO listener names: INTERNAL (within docker) and EXTERNAL (from host)
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
-      # Define the ports each listener uses *inside* the container
-      KAFKA_LISTENERS: INTERNAL://:29092,EXTERNAL://:9092
-      # Use hostname 'kafka' for internal, 'localhost' for external
-      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:29092,EXTERNAL://localhost:9092
-      # Tell brokers to use the INTERNAL listener for communicating with each other
-      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
-
-      # --- Other Config ---
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-
+    image: confluentinc/cp-kafka:7.8.0
     depends_on:
       - zookeeper
-
-  init-kafka:
-    image: confluentinc/cp-kafka:7.3.0
-    depends_on:
-      - kafka
-    entrypoint: ["/bin/sh", "-c"]
-    command: |
-      "
-      echo 'Waiting for Kafka broker...'
-      # Keep trying to list topics until it succeeds or times out
-      count=0
-      while ! kafka-topics --bootstrap-server kafka:29092 --list > /dev/null 2>&1 ; do
-        sleep 5
-        count=$((count+1))
-        if [ $count -ge 24 ] ; then
-          echo 'ERROR: Kafka broker did not become available after 120 seconds!'
-          exit 1
-        fi
-        echo -n '.'
-      done
-      echo ' Kafka broker is ready!'
-
-      echo -e 'Creating kafka topics'
-      # --- FIX: Connect to the INTERNAL listener port ---
-      kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists --topic flow_events --replication-factor 1 --partitions 1
-
-      echo -e 'Successfully created the following topics:'
-      # --- FIX: Connect to the INTERNAL listener port ---
-      kafka-topics --bootstrap-server kafka:29092 --list
-      "
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
