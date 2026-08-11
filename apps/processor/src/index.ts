@@ -17,7 +17,7 @@ async function main() {
   const producer = kafka.producer();
   await producer.connect();
 
-  while (1) {
+  while (true) {
     const pendingRows = await prisma.flowRunOutbox.findMany({
       where: {},
       include: {
@@ -34,10 +34,15 @@ async function main() {
       take: 10,
     });
 
+    if (pendingRows.length == 0) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      continue;
+    }
+
     //created the topic from the akfka cli
     await producer.send({
       topic: TOPIC_NAME,
-      messages: pendingRows.map((r:any) => ({
+      messages: pendingRows.map((r: any) => ({
         value: JSON.stringify({
           userId: r.flowRun.flow.userId,
           flowRunId: r.flowRunId,
@@ -50,7 +55,7 @@ async function main() {
     await prisma.flowRunOutbox.deleteMany({
       where: {
         id: {
-          in: pendingRows.map((r:any) => r.id),
+          in: pendingRows.map((r: any) => r.id),
         },
       },
     });
