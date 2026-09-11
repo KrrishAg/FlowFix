@@ -109,7 +109,7 @@ async function main() {
         const email = parse(actionMetadata?.email, combinedObject);
         const body = parse(actionMetadata?.body, combinedObject);
         console.log(`Sending out an email ${email} with the body ${body}`);
-        sendEmail({ email, message: body });
+        await sendEmail({ email, message: body });
       }
       if (currAction.actionTypeId === "send-sol") {
         console.log(`Stage ${stage} running: Sending out solana`);
@@ -124,7 +124,7 @@ async function main() {
         const phone = parse(actionMetadata?.phone, combinedObject);
         const body = parse(actionMetadata?.body, combinedObject);
         console.log(`Sending out sms to ${phone} with message ${body}`);
-        sendSms({ phone, message: body });
+        await sendSms({ phone, message: body });
       }
       if (currAction.actionTypeId === "discord") {
         console.log(`Stage ${stage} running: Sending out a discord message`);
@@ -139,7 +139,7 @@ async function main() {
         console.log(
           `Sending out discord message to webhook url: ${url} with message ${message}`
         );
-        sendDiscordMessage({ url, message, hyperlink, title });
+        await sendDiscordMessage({ url, message, hyperlink, title });
       }
 
       if (currAction.actionTypeId === "apireq") {
@@ -170,7 +170,7 @@ async function main() {
         console.log(
           `Trying to hit an api endpoint: ${url}, method ${method} with headers ${parsedHeaders} and body ${parsedBody}`
         );
-        sendAPIReq({
+        await sendAPIReq({
           url,
           method,
           //@ts-ignore
@@ -188,7 +188,7 @@ async function main() {
         const message = parse(actionMetadata?.message, combinedObject);
 
         console.log(`Sending out telegram with message ${message}`);
-        sendTelegramMessage({ botToken, chatId, message });
+        await sendTelegramMessage({ botToken, chatId, message });
       }
 
       let res = true;
